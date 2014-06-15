@@ -18,5 +18,8 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 
+# Carpetas creadas por mi #
+Librerias/
+
 # Class Files #
 *.class
