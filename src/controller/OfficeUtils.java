@@ -109,5 +109,52 @@ public class OfficeUtils {
             System.out.println(ex.getMessage());
         }
     }
+       
+    /*
+    public static void main(String[] args) throws Exception {
+		String filename = "\\Users\\Manuu Alcocer\\Downloads\\salarios.xlsx";
+		FileInputStream fis = null;
+
+		try {
+
+			fis = new FileInputStream(filename);
+			XSSFWorkbook workbook = new XSSFWorkbook(fis);
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			Iterator rowIter = sheet.rowIterator(); 
+
+			while(rowIter.hasNext()){
+				XSSFRow myRow = (XSSFRow) rowIter.next();
+				Iterator cellIter = myRow.cellIterator();
+				ArrayList<String> cellStoreVector=new ArrayList<>();
+				while(cellIter.hasNext()){
+					XSSFCell myCell = (XSSFCell) cellIter.next();
+					String cellvalue = myCell.getRawValue();
+					cellStoreVector.add(cellvalue);
+				}
+				String firstcolumnValue = null;
+				String secondcolumnValue = null;
+
+				int i = 0;
+				firstcolumnValue = cellStoreVector.get(i); 
+                                try {
+				secondcolumnValue = cellStoreVector.get(i+1);
+                                } catch (IndexOutOfBoundsException IOB) {System.out.println(IOB.toString());}
+				insertQuery(firstcolumnValue,secondcolumnValue);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (fis != null) {
+				fis.close();
+			}
+		}
+
+//		showExelData(sheetData);
+	}
+
+    private static void insertQuery(String firstcolumnvalue,String secondcolumnvalue) {
+		System.out.println(firstcolumnvalue +  " "  +secondcolumnvalue);
+    }
+*/ 
     
 }//fin

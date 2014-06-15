@@ -24,11 +24,13 @@ import java.util.Iterator;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
-/* Librerias exclusivas de Apache POI */
+/* Librerias exclusivas de Apache POI para Microsoft Office Excel*/
+//Excel 2010 en adelante (xlsx)
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+//Excel 2007 y anteriores (xls)
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -57,56 +59,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class FileUtilities {
 
     public String path;
+    XSSFWorkbook wb = null;
     
     public FileUtilities(String path){
         this.path = path;
     }
-    
-    /*
-    public static void main(String[] args) throws Exception {
-		String filename = "\\Users\\Manuu Alcocer\\Downloads\\salarios.xlsx";
-		FileInputStream fis = null;
-
-		try {
-
-			fis = new FileInputStream(filename);
-			XSSFWorkbook workbook = new XSSFWorkbook(fis);
-			XSSFSheet sheet = workbook.getSheetAt(0);
-			Iterator rowIter = sheet.rowIterator(); 
-
-			while(rowIter.hasNext()){
-				XSSFRow myRow = (XSSFRow) rowIter.next();
-				Iterator cellIter = myRow.cellIterator();
-				ArrayList<String> cellStoreVector=new ArrayList<>();
-				while(cellIter.hasNext()){
-					XSSFCell myCell = (XSSFCell) cellIter.next();
-					String cellvalue = myCell.getRawValue();
-					cellStoreVector.add(cellvalue);
-				}
-				String firstcolumnValue = null;
-				String secondcolumnValue = null;
-
-				int i = 0;
-				firstcolumnValue = cellStoreVector.get(i); 
-                                try {
-				secondcolumnValue = cellStoreVector.get(i+1);
-                                } catch (IndexOutOfBoundsException IOB) {System.out.println(IOB.toString());}
-				insertQuery(firstcolumnValue,secondcolumnValue);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (fis != null) {
-				fis.close();
-			}
-		}
-
-//		showExelData(sheetData);
-	}
-
-    private static void insertQuery(String firstcolumnvalue,String secondcolumnvalue) {
-		System.out.println(firstcolumnvalue +  " "  +secondcolumnvalue);
-    }
-*/ 
     
 }//fin
