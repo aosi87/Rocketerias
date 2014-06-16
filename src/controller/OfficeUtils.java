@@ -25,6 +25,47 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class OfficeUtils {
     
+    private int numSheetTabs = 0;
+    private int numRows = 0;
+    private int numColumns = 0;
+    private String nameSheetTab = "";
+    
+    private HSSFWorkbook xlsWorkbook = null; //Office 2003 (xls)
+    private HSSFSheet sheetXLS = null;
+    private XSSFWorkbook xlsxWorkbook = null; //Office 2007 (xlsx)
+    private XSSFSheet sheetXLSX = null;
+    
+    public OfficeUtils(){}
+    
+    public OfficeUtils(HSSFWorkbook xlsFile){
+        this.xlsWorkbook = xlsFile;
+    }
+    
+    public OfficeUtils(XSSFWorkbook xlsxFile){
+        this.xlsxWorkbook = xlsxFile;
+    }
+    
+    public OfficeUtils(File file){
+            try {
+            String fileToReadname = file.getName();
+            String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
+                    + 1, fileToReadname.length());
+            String excel2003 = "xls";
+            String excel2007 = "xlsx";
+            if (excel2003.equalsIgnoreCase(extension)) {
+                FileInputStream Excel2003FileToRead = new FileInputStream(file);
+                this.xlsWorkbook = new HSSFWorkbook(Excel2003FileToRead);
+                //readXLSFile(Excel2003FileToRead);
+              } else if (excel2007.equalsIgnoreCase(extension)) {
+                FileInputStream Excel2007FileToRead = new FileInputStream(file);
+                this.xlsxWorkbook = new XSSFWorkbook(Excel2007FileToRead);
+                //readXLSXFile(Excel2007FileToRead);
+              }
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+              }
+    }
+    
     /**
      * Con este metodo leeremos los archivos en modo de compatibilidad, es decir los archivos
      * con extencion .xls o creados con Microsoft Office 2007 o anteriores.
@@ -90,24 +131,56 @@ public class OfficeUtils {
         }
     }
     
-       public static void main(String[] args) {
-        try {
-            File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Plantillas_salida_Listasprecios.xlsx");
-            String fileToReadname = fileToRead.getName();
-            String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
-                    + 1, fileToReadname.length());
-            String excel2003 = "xls";
-            String excel2007 = "xlsx";
-            if (excel2003.equalsIgnoreCase(extension)) {
-                FileInputStream Excel2003FileToRead = new FileInputStream(fileToRead);
-                readXLSFile(Excel2003FileToRead);
-            } else if (excel2007.equalsIgnoreCase(extension)) {
-                FileInputStream Excel2007FileToRead = new FileInputStream(fileToRead);
-                readXLSXFile(Excel2007FileToRead);
+    public void readExcel(){
+        if(this.xlsWorkbook==null){
+        XSSFSheet xsheet = this.xlsxWorkbook.getSheetAt(0);
+        XSSFRow xrow;
+        XSSFCell xcell;
+        Iterator xrows = xsheet.rowIterator();
+        while (xrows.hasNext()) {
+            xrow = (XSSFRow) xrows.next();
+            Iterator xcells = xrow.cellIterator();
+            while (xcells.hasNext()) {
+                xcell = (XSSFCell) xcells.next();
+                if (xcell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
+                    System.out.print(xcell.getStringCellValue() + " ");
+                } else if (xcell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+                    System.out.print(xcell.getNumericCellValue() + " ");
+                } else {
+                    //U Can Handel Boolean, Formula, Errors
+                }
             }
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("");
         }
+        } else {
+            HSSFSheet sheet = this.xlsWorkbook.getSheetAt(0);
+        HSSFRow row;
+        HSSFCell cell;
+        Iterator rows = sheet.rowIterator();
+        while (rows.hasNext()) {
+            row = (HSSFRow) rows.next();
+            Iterator cells = row.cellIterator();
+            while (cells.hasNext()) {
+                cell = (HSSFCell) cells.next();
+                if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+                    System.out.print(cell.getStringCellValue() + " ");
+                } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                    System.out.print(cell.getNumericCellValue() + " ");
+                } else {
+                    //U Can Handel Boolean, Formula, Errors
+                }
+            }
+            System.out.println();
+        }
+        
+        }
+    }
+    
+    
+    public static void main(String[] args) {
+        File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Plantillas_salida_Listasprecios.xlsx");
+        OfficeUtils ou = new OfficeUtils(fileToRead);
+        ou.readExcel();
     }
        
     /*
@@ -156,5 +229,117 @@ public class OfficeUtils {
 		System.out.println(firstcolumnvalue +  " "  +secondcolumnvalue);
     }
 */ 
+
+    /**
+     * @return the numSheetTabs
+     */
+    public int getNumSheetTabs() {
+        return numSheetTabs;
+    }
+
+    /**
+     * @param numSheetTabs the numSheetTabs to set
+     */
+    public void setNumSheetTabs(int numSheetTabs) {
+        this.numSheetTabs = numSheetTabs;
+    }
+
+    /**
+     * @return the numRows
+     */
+    public int getNumRows() {
+        return numRows;
+    }
+
+    /**
+     * @param numRows the numRows to set
+     */
+    public void setNumRows(int numRows) {
+        this.numRows = numRows;
+    }
+
+    /**
+     * @return the numColumns
+     */
+    public int getNumColumns() {
+        return numColumns;
+    }
+
+    /**
+     * @param numColumns the numColumns to set
+     */
+    public void setNumColumns(int numColumns) {
+        this.numColumns = numColumns;
+    }
+
+    /**
+     * @return the nameSheetTab
+     */
+    public String getNameSheetTab() {
+        return nameSheetTab;
+    }
+
+    /**
+     * @param nameSheetTab the nameSheetTab to set
+     */
+    public void setNameSheetTab(String nameSheetTab) {
+        this.nameSheetTab = nameSheetTab;
+    }
+
+    /**
+     * @return the xlsxWorkbook
+     */
+    public HSSFWorkbook getXLSWorkbook() {
+        return xlsWorkbook;
+    }
+
+    /**
+     * @param xlsWorkbook the xlsWorkbook to set
+     */
+    public void setXLSWorkbook(HSSFWorkbook xlsWorkbook) {
+        this.xlsWorkbook = xlsWorkbook;
+    }
+
+    /**
+     * @return the sheetXLS
+     */
+    public HSSFSheet getSheetXLS() {
+        return sheetXLS;
+    }
+
+    /**
+     * @param sheetXLS the sheetXLS to set
+     */
+    public void setSheetXLS(HSSFSheet sheetXLS) {
+        this.sheetXLS = sheetXLS;
+    }
+
+    /**
+     * @return the xlsxWorkbook
+     */
+    public XSSFWorkbook getXLSXWorkbook() {
+        return xlsxWorkbook;
+    }
+
+    /**
+     * @param xlsxWorkbook the xlsxWorkbook to set
+     */
+    public void setXLSXWorkbook(XSSFWorkbook xlsxWorkbook) {
+        this.xlsxWorkbook = xlsxWorkbook;
+    }
+
+    /**
+     * @return the sheetXLSX
+     */
+    public XSSFSheet getSheetXLSX() {
+        return sheetXLSX;
+    }
+
+    /**
+     * @param sheetXLSX the sheetXLS to set
+     */
+    public void setSheetXLSX(XSSFSheet sheetXLSX) {
+        this.sheetXLSX = sheetXLSX;
+    }
     
 }//fin

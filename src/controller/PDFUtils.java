@@ -45,6 +45,11 @@ public class PDFUtils {
          e.printStackTrace();
         } 
      }
+        
+        public static void main(String[] args){
+            PDFUtils pdf = new PDFUtils();
+            pdf.readPDF();
+        }
        
     
 }
