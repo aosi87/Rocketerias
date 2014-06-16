@@ -59,10 +59,16 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class FileUtilities {
 
     public String path;
+    
+    private OfficeUtils libro = null;
+    private PDFUtils pdf = null;
+    
     XSSFWorkbook wb = null;
     
     public FileUtilities(String path){
         this.path = path;
     }
+    
+    public FileUtilities(){}
     
 }//fin
