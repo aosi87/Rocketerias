@@ -7,7 +7,17 @@
 package view;
 
 import com.alee.laf.WebLookAndFeel;
+import java.awt.BorderLayout;
+import java.io.File;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.ProgressMonitor;
+import javax.swing.ProgressMonitorInputStream;
+import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -20,8 +30,11 @@ public class MainView extends javax.swing.JFrame {
      */
     public MainView() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -31,54 +44,100 @@ public class MainView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel2 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jLabelLogo = new javax.swing.JLabel();
+        jButtonCargar = new javax.swing.JButton();
+        jButtonExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel2.setText("jLabel2");
+        jLabelLogo.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        jLabelLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelLogo.setText("Logo");
 
-        jButton2.setText("jButton2");
+        jButtonCargar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jButtonCargar.setText("Cargar archivo");
+        jButtonCargar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCargarActionPerformed(evt);
+            }
+        });
 
-        jButton3.setText("jButton3");
+        jButtonExit.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jButtonExit.setText("Salir");
+        jButtonExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonExitActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(164, Short.MAX_VALUE)
-                .addComponent(jButton2)
-                .addGap(18, 18, 18)
-                .addComponent(jButton3)
-                .addGap(11, 11, 11))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(jLabelLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButtonCargar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonExit, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                .addComponent(jLabelLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonCargar, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                    .addComponent(jButtonExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButtonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCargarActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        //Agregamos un filtro de extensiones
+        //fileChooser.setFileFilter(new FileNameExtensionFilter("Doc - MS-Office 2003", "doc"));
+        int returnValue = fileChooser.showDialog(null,"Seleccionar");
+        switch(returnValue){
+            case JFileChooser.APPROVE_OPTION:
+                //File selectedFile = fileChooser.getSelectedFile();
+                System.out.println(fileChooser.getSelectedFile().getName());
+                loadDialog();
+                new view.TableView(fileChooser.getSelectedFile().getName()).setVisible(true);
+                this.dispose();
+                break;
+            case JFileChooser.CANCEL_OPTION:
+                System.err.println("CancelOption");
+                break;
+            case JFileChooser.ERROR_OPTION:
+                System.err.println("ErrorDesconocido");
+                break;
+            default:
+                System.err.println("Ocurrio un problema"+fileChooser.toString());
+                break;
+        }
+    }//GEN-LAST:event_jButtonCargarActionPerformed
+
+    private void jButtonExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExitActionPerformed
+        // TODO add your handling code here:
+        //simplemente cerramos la instancia, o la aplicacion por completo.
+        this.dispose();
+    }//GEN-LAST:event_jButtonExitActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set WebLAF look and feel */
-        WebLookAndFeel.install();
+        //WebLookAndFeel.install();
         
         /*
         try
@@ -95,7 +154,7 @@ public class MainView extends javax.swing.JFrame {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         *
+         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -112,8 +171,7 @@ public class MainView extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-*/
+        //</editor-fold>*/
         
         
         /* Create and display the form */
@@ -125,8 +183,28 @@ public class MainView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton jButtonCargar;
+    private javax.swing.JButton jButtonExit;
+    private javax.swing.JLabel jLabelLogo;
     // End of variables declaration//GEN-END:variables
+
+    private void loadDialog() {
+        final JDialog dialog = new JDialog();
+        dialog.setSize(350, 85);
+        dialog.setAlwaysOnTop(true);
+        dialog.setLocationRelativeTo(this);
+        final ProgressMonitor pm = new ProgressMonitor(dialog,"Cargando...","", 0, 100);
+        pm.setProgress(0);
+        pm.setMaximum(100);
+        pm.setNote("Carga al "+20+"%");
+        pm.setMillisToDecideToPopup(200);
+        pm.setProgress(50);
+        
+         Timer timer = new Timer(500, null);
+         timer.start();
+        
+        dialog.setVisible(true);
+    
+    }    
+    
 }
