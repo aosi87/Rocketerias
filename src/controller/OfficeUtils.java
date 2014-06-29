@@ -9,7 +9,11 @@ package controller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import javax.swing.JFrame;
+import javax.swing.ProgressMonitor;
+import javax.swing.ProgressMonitorInputStream;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -29,6 +33,8 @@ public class OfficeUtils {
     private int numRows = 0;
     private int numColumns = 0;
     private String nameSheetTab = "";
+    //private ProgressMonitorInputStream Excel2003FileToRead;
+    //private ProgressMonitorInputStream Excel2007FileToRead;
     
     private HSSFWorkbook xlsWorkbook = null; //Office 2003 (xls)
     private HSSFSheet sheetXLS = null;
@@ -44,6 +50,29 @@ public class OfficeUtils {
     public OfficeUtils(XSSFWorkbook xlsxFile){
         this.xlsxWorkbook = xlsxFile;
     }
+    
+//    public OfficeUtils(File file, JFrame frame){
+//            try {
+//            String fileToReadname = file.getName();
+//            String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
+//                    + 1, fileToReadname.length());
+//            String excel2003 = "xls";
+//            String excel2007 = "xlsx";
+//            if (excel2003.equalsIgnoreCase(extension)) {
+//                Excel2003FileToRead = new ProgressMonitorInputStream(frame,"Leyendo",new FileInputStream(file));
+//                Excel2003FileToRead = new FileInputStream(file);
+//                this.xlsWorkbook = new HSSFWorkbook(Excel2003FileToRead);
+//                readXLSFile(Excel2003FileToRead);
+//              } else if (excel2007.equalsIgnoreCase(extension)) {
+//                Excel2007FileToRead = new ProgressMonitorInputStream(frame,"Leyendo",new FileInputStream(file));  
+//                Excel2007FileToRead = new FileInputStream(file);
+//                this.xlsxWorkbook = new XSSFWorkbook(Excel2007FileToRead);
+//                readXLSXFile(Excel2007FileToRead);
+//              }
+//            } catch (IOException ex) {
+//                System.out.println(ex.getMessage());
+//              }
+//    }
     
     public OfficeUtils(File file){
             try {
@@ -170,17 +199,72 @@ public class OfficeUtils {
                     //U Can Handel Boolean, Formula, Errors
                 }
             }
-            System.out.println();
+            System.out.print("");
         }
         
         }
     }
     
-    
+      public ArrayList createArrayList(){
+        ArrayList filas = new ArrayList<>();
+        ArrayList celdas  = new ArrayList<>();
+        int numColumn=0;
+        int numRow = 0;
+        XSSFSheet xsheet = this.xlsxWorkbook.getSheetAt(0);
+        XSSFRow xrow;
+        XSSFCell xcell;
+        Iterator xrows = xsheet.rowIterator();
+        while (xrows.hasNext()) {
+            //filas.add(celdas);
+            xrow = (XSSFRow) xrows.next();
+            numRow = xrow.getRowNum()+1;
+            Iterator xcells = xrow.cellIterator();
+            
+            while (xcells.hasNext()) {
+                xcell = (XSSFCell) xcells.next();
+                numColumn = xcell.getColumnIndex()+1;
+                
+                switch(xcell.getCellType()){
+                    case XSSFCell.CELL_TYPE_BLANK:
+                        celdas.add("");
+                        //System.out.print(xcell.getStringCellValue() + " ");
+                        break;
+                        
+                    case XSSFCell.CELL_TYPE_NUMERIC:
+                        celdas.add(xcell.getNumericCellValue());
+                        //System.out.print(xcell.getNumericCellValue() + " ");
+                        break;
+                        
+                    case XSSFCell.CELL_TYPE_STRING:
+                        celdas.add(xcell.getStringCellValue());
+                        //System.out.print(xcell.getStringCellValue() + " ");
+                        break;
+                        
+                    default:
+                        //if(xcell.getRowIndex() == numColumn)  
+                        //System.out.print("");
+                        break;
+                }
+            }
+        }
+        
+        System.out.println("filas: "+numRow+" columnas: "+numColumn);
+        print(celdas);
+        return filas;
+    }
+      
+    public void print(ArrayList a){
+        for (Object a1 : a) 
+           // for (Object b1: (ArrayList)a1) 
+                System.out.println( a1.toString() );   
+    }
+
     public static void main(String[] args) {
-        File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Plantillas_salida_Listasprecios.xlsx");
+        File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\plantilla salida.xlsx");
+        //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Plantillas_salida_Listasprecios.xlsx");
+        //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Date test.xlsx"); 
         OfficeUtils ou = new OfficeUtils(fileToRead);
-        ou.readExcel();
+        ou.createArrayList();
     }
        
     /*
@@ -341,5 +425,5 @@ public class OfficeUtils {
     public void setSheetXLSX(XSSFSheet sheetXLSX) {
         this.sheetXLSX = sheetXLSX;
     }
-    
+        
 }//fin
