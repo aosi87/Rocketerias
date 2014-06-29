@@ -6,18 +6,10 @@
 
 package view;
 
-import com.alee.laf.WebLookAndFeel;
-import java.awt.BorderLayout;
-import java.io.File;
-import javax.swing.JDialog;
+import controller.OfficeUtils;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 import javax.swing.ProgressMonitor;
-import javax.swing.ProgressMonitorInputStream;
-import javax.swing.Timer;
 import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -49,6 +41,7 @@ public class MainView extends javax.swing.JFrame {
         jButtonExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
 
         jLabelLogo.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jLabelLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -110,7 +103,8 @@ public class MainView extends javax.swing.JFrame {
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
                 System.out.println(fileChooser.getSelectedFile().getName());
-                loadDialog();
+                OfficeUtils ou = new OfficeUtils(fileChooser.getSelectedFile());
+                ou.createArrayList();
                 new view.TableView(fileChooser.getSelectedFile().getName()).setVisible(true);
                 this.dispose();
                 break;
@@ -136,12 +130,11 @@ public class MainView extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set WebLAF look and feel */
+        // Set WebLAF look and feel 
         //WebLookAndFeel.install();
         
         /*
-        try
-        { 
+        try { 
          // Setting up WebLookAndFeel style
             UIManager.setLookAndFeel ( WebLookAndFeel.class.getCanonicalName () );
         }
@@ -150,7 +143,7 @@ public class MainView extends javax.swing.JFrame {
             // Something went wrong
         }*/
         
-        /* Set the Nimbus look and feel */
+        // Set the Nimbus look and feel 
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -158,7 +151,8 @@ public class MainView extends javax.swing.JFrame {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    //javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     break;
                 }
             }
@@ -176,6 +170,7 @@ public class MainView extends javax.swing.JFrame {
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new MainView().setVisible(true);
             }
@@ -188,23 +183,4 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabelLogo;
     // End of variables declaration//GEN-END:variables
 
-    private void loadDialog() {
-        final JDialog dialog = new JDialog();
-        dialog.setSize(350, 85);
-        dialog.setAlwaysOnTop(true);
-        dialog.setLocationRelativeTo(this);
-        final ProgressMonitor pm = new ProgressMonitor(dialog,"Cargando...","", 0, 100);
-        pm.setProgress(0);
-        pm.setMaximum(100);
-        pm.setNote("Carga al "+20+"%");
-        pm.setMillisToDecideToPopup(200);
-        pm.setProgress(50);
-        
-         Timer timer = new Timer(500, null);
-         timer.start();
-        
-        dialog.setVisible(true);
-    
-    }    
-    
 }
