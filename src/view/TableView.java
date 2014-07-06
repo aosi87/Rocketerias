@@ -105,7 +105,7 @@ public class TableView extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Archivo", jScrollPane1);
 
-        jPanelManejoTabla.setLayout(new java.awt.GridLayout());
+        jPanelManejoTabla.setLayout(new java.awt.GridLayout(1, 0));
 
         jButtonFilas.setText("<html><center>Seleccionar<br>Filas/Columnas</center></html>");
         jButtonFilas.setMaximumSize(new java.awt.Dimension(87, 37));
@@ -128,7 +128,7 @@ public class TableView extends javax.swing.JFrame {
         jButton7.setText("<html><center>Adjuntar<br>Datos</center></html>");
         jPanelManejoTabla.add(jButton7);
 
-        jPanelManejoDatos.setLayout(new java.awt.GridLayout());
+        jPanelManejoDatos.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton1.setText("<html><center>Borrar<br>Selección</center></html>");
         jPanelManejoDatos.add(jButton1);
