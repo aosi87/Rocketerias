@@ -4,20 +4,23 @@
  * and open the template in the editor.
  */
 
-package controller;
+package model;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -27,12 +30,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author Isaac Alcocer <aosi87@gmail.com>
  */
-public class OfficeUtils {
+public class ExcelModel {
     
     private int numSheetTabs = 0;
     private int numRows = 0;
     private int numColumns = 0;
     private String nameSheetTab = "";
+    private Vector data = null;
     //private ProgressMonitorInputStream Excel2003FileToRead;
     //private ProgressMonitorInputStream Excel2007FileToRead;
     
@@ -41,17 +45,17 @@ public class OfficeUtils {
     private XSSFWorkbook xlsxWorkbook = null; //Office 2007 (xlsx)
     private XSSFSheet sheetXLSX = null;
     
-    public OfficeUtils(){}
+    public ExcelModel(){}
     
-    public OfficeUtils(HSSFWorkbook xlsFile){
+    public ExcelModel(HSSFWorkbook xlsFile){
         this.xlsWorkbook = xlsFile;
     }
     
-    public OfficeUtils(XSSFWorkbook xlsxFile){
+    public ExcelModel(XSSFWorkbook xlsxFile){
         this.xlsxWorkbook = xlsxFile;
     }
     
-//    public OfficeUtils(File file, JFrame frame){
+//    public ExcelModel(File file, JFrame frame){
 //            try {
 //            String fileToReadname = file.getName();
 //            String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
@@ -74,7 +78,7 @@ public class OfficeUtils {
 //              }
 //    }
     
-    public OfficeUtils(File file){
+    public ExcelModel(File file){
             try {
             String fileToReadname = file.getName();
             String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
@@ -205,20 +209,68 @@ public class OfficeUtils {
         }
     }
     
-      public ArrayList createArrayList(){
-        ArrayList filas = new ArrayList<>();
+    public Vector createDataVector(){
+        data = new Vector();
+        Vector d = null;
+        XSSFSheet sheet = this.xlsxWorkbook.getSheetAt(0);
+        XSSFRow row;
+        int rows = 0;
+        System.err.println(sheet.getPhysicalNumberOfRows());
+         for ( int i = 0; i < sheet.getPhysicalNumberOfRows(); i ++ ){
+          d = new Vector();
+          row = sheet.getRow( i );
+          if(rows < row.getPhysicalNumberOfCells())
+           rows = row.getPhysicalNumberOfCells();
+          for ( int j = 0; j < row.getPhysicalNumberOfCells(); j++ ){
+              XSSFCell cell = row.getCell( j );
+              if ( cell == null)
+                  d.add("");
+              if ( cell != null)
+              switch(cell.getCellType()){
+                    case XSSFCell.CELL_TYPE_BLANK:
+                        d.add(" ");
+                        //System.out.print(xcell.getStringCellValue() + " ");
+                        break;
+                        
+                    case XSSFCell.CELL_TYPE_NUMERIC:
+                        d.add(cell.getNumericCellValue());
+                        //System.out.print(xcell.getNumericCellValue() + " ");
+                        break;
+                        
+                    case XSSFCell.CELL_TYPE_STRING:
+                        d.add(cell.getStringCellValue());
+                        //System.out.print(xcell.getStringCellValue() + " ");
+                        break;
+                        
+                    default:
+                        d.add("NULL");
+                        //if(xcell.getRowIndex() == numColumn)  
+                        //System.out.print("");
+                        break;
+                }
+          }
+                    //d.add( "\n" );
+                    data.add( d );
+         } 
+         //printVector(data);
+         this.setNumColumns(rows);
+         this.setNumRows(sheet.getPhysicalNumberOfRows());
+         return data;
+}
+    
+    public ArrayList createArrayList(){
         ArrayList celdas  = new ArrayList<>();
-        int numColumn=0;
+        ArrayList tripleta = new ArrayList<>();
+        int numColumn = 0;
         int numRow = 0;
         XSSFSheet xsheet = this.xlsxWorkbook.getSheetAt(0);
         XSSFRow xrow;
         XSSFCell xcell;
-        Iterator xrows = xsheet.rowIterator();
+        Iterator xrows = xsheet.iterator();
         while (xrows.hasNext()) {
-            //filas.add(celdas);
             xrow = (XSSFRow) xrows.next();
             numRow = xrow.getRowNum()+1;
-            Iterator xcells = xrow.cellIterator();
+            Iterator xcells = xrow.iterator();
             
             while (xcells.hasNext()) {
                 xcell = (XSSFCell) xcells.next();
@@ -226,7 +278,7 @@ public class OfficeUtils {
                 
                 switch(xcell.getCellType()){
                     case XSSFCell.CELL_TYPE_BLANK:
-                        celdas.add("");
+                        celdas.add("BLANK");
                         //System.out.print(xcell.getStringCellValue() + " ");
                         break;
                         
@@ -240,79 +292,50 @@ public class OfficeUtils {
                         //System.out.print(xcell.getStringCellValue() + " ");
                         break;
                         
-                    default:
+                    case XSSFCell.CELL_TYPE_FORMULA:
                         //if(xcell.getRowIndex() == numColumn)  
                         //System.out.print("");
+                        celdas.add(xcell.getNumericCellValue());
+                        //celdas.add("FORMULA");
+                        break;
+                    case XSSFCell.CELL_TYPE_BOOLEAN:
+                        break;
+                    
+                    case XSSFCell.CELL_TYPE_ERROR:
+                        System.err.println(xcell.toString());
+                        break;
+                        
+                    default:
+                        celdas.add("NULL");
                         break;
                 }
+                
+
             }
         }
         
+        
+        celdas.trimToSize();
         System.out.println("filas: "+numRow+" columnas: "+numColumn);
-        print(celdas);
-        return filas;
+        tripleta.add(numRow);
+        tripleta.add(numColumn);
+        tripleta.add(celdas);
+        tripleta.trimToSize();
+        this.setNumColumns(numColumn);
+        this.setNumRows(numRow);
+        //printArrayList(tripleta);
+        return tripleta;
     }
       
-    public void print(ArrayList a){
-        for (Object a1 : a) 
-           // for (Object b1: (ArrayList)a1) 
-                System.out.println( a1.toString() );   
-    }
-
     public static void main(String[] args) {
-        File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\plantilla salida.xlsx");
+        //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\plantilla salida.xlsx");
         //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Plantillas_salida_Listasprecios.xlsx");
-        //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Date test.xlsx"); 
-        OfficeUtils ou = new OfficeUtils(fileToRead);
+        File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\EAW 2013 Distributor Pricelist AUGUST Update.xlsx"); 
+        ExcelModel ou = new ExcelModel(fileToRead);
+        //ou.createArrayList();
+        ou.createDataVector();
         ou.createArrayList();
     }
-       
-    /*
-    public static void main(String[] args) throws Exception {
-		String filename = "\\Users\\Manuu Alcocer\\Downloads\\salarios.xlsx";
-		FileInputStream fis = null;
-
-		try {
-
-			fis = new FileInputStream(filename);
-			XSSFWorkbook workbook = new XSSFWorkbook(fis);
-			XSSFSheet sheet = workbook.getSheetAt(0);
-			Iterator rowIter = sheet.rowIterator(); 
-
-			while(rowIter.hasNext()){
-				XSSFRow myRow = (XSSFRow) rowIter.next();
-				Iterator cellIter = myRow.cellIterator();
-				ArrayList<String> cellStoreVector=new ArrayList<>();
-				while(cellIter.hasNext()){
-					XSSFCell myCell = (XSSFCell) cellIter.next();
-					String cellvalue = myCell.getRawValue();
-					cellStoreVector.add(cellvalue);
-				}
-				String firstcolumnValue = null;
-				String secondcolumnValue = null;
-
-				int i = 0;
-				firstcolumnValue = cellStoreVector.get(i); 
-                                try {
-				secondcolumnValue = cellStoreVector.get(i+1);
-                                } catch (IndexOutOfBoundsException IOB) {System.out.println(IOB.toString());}
-				insertQuery(firstcolumnValue,secondcolumnValue);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (fis != null) {
-				fis.close();
-			}
-		}
-
-//		showExelData(sheetData);
-	}
-
-    private static void insertQuery(String firstcolumnvalue,String secondcolumnvalue) {
-		System.out.println(firstcolumnvalue +  " "  +secondcolumnvalue);
-    }
-*/ 
 
     /**
      * @return the numSheetTabs
@@ -425,5 +448,73 @@ public class OfficeUtils {
     public void setSheetXLSX(XSSFSheet sheetXLSX) {
         this.sheetXLSX = sheetXLSX;
     }
+    
+    public void printArrayList(ArrayList a){
+                             //filas   columnas
+        System.out.println(a.get(0)+" "+a.get(1));
+        for (int i = 0 ; i < ((ArrayList)a.get(2)).size(); i++){
+          //if(!((ArrayList)a.get(2)).get(i).toString().equalsIgnoreCase(""))
+              System.out.print(((ArrayList)a.get(2)).get(i).toString()+" ");
+          if((i+1)%(int)a.get(1) == 0)
+              System.out.println(i+"-"+(i+1)%(int)a.get(1));
+        }   
+    }
+    
+    public void printVector(Vector a){
+                             //filas   columnas
+        System.out.println(a.size()+" "+((Vector)a.get(1)).size());
+        for (int i = 0 ; i < a.size(); i++){
+          //if(!((ArrayList)a.get(2)).get(i).toString().equalsIgnoreCase(""))
+              System.out.println(a.get(i));
+          //if((i+1)%(int)a.get(1) == 0)
+           //   System.out.println();
+        }   
+    }
         
+    /*
+    public static void main(String[] args) throws Exception {
+		String filename = "\\Users\\Manuu Alcocer\\Downloads\\salarios.xlsx";
+		FileInputStream fis = null;
+
+		try {
+
+			fis = new FileInputStream(filename);
+			XSSFWorkbook workbook = new XSSFWorkbook(fis);
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			Iterator rowIter = sheet.rowIterator(); 
+
+			while(rowIter.hasNext()){
+				XSSFRow myRow = (XSSFRow) rowIter.next();
+				Iterator cellIter = myRow.cellIterator();
+				ArrayList<String> cellStoreVector=new ArrayList<>();
+				while(cellIter.hasNext()){
+					XSSFCell myCell = (XSSFCell) cellIter.next();
+					String cellvalue = myCell.getRawValue();
+					cellStoreVector.add(cellvalue);
+				}
+				String firstcolumnValue = null;
+				String secondcolumnValue = null;
+
+				int i = 0;
+				firstcolumnValue = cellStoreVector.get(i); 
+                                try {
+				secondcolumnValue = cellStoreVector.get(i+1);
+                                } catch (IndexOutOfBoundsException IOB) {System.out.println(IOB.toString());}
+				insertQuery(firstcolumnValue,secondcolumnValue);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (fis != null) {
+				fis.close();
+			}
+		}
+
+//		showExelData(sheetData);
+	}
+
+    private static void insertQuery(String firstcolumnvalue,String secondcolumnvalue) {
+		System.out.println(firstcolumnvalue +  " "  +secondcolumnvalue);
+    }
+*/ 
 }//fin

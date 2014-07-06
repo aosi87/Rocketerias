@@ -6,9 +6,8 @@
 
 package view;
 
-import controller.OfficeUtils;
+import controller.ViewsController;
 import javax.swing.JFileChooser;
-import javax.swing.ProgressMonitor;
 import javax.swing.UIManager;
 
 /**
@@ -102,10 +101,10 @@ public class MainView extends javax.swing.JFrame {
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
-                System.out.println(fileChooser.getSelectedFile().getName());
-                OfficeUtils ou = new OfficeUtils(fileChooser.getSelectedFile());
-                ou.createArrayList();
-                new view.TableView(fileChooser.getSelectedFile().getName()).setVisible(true);
+                //System.out.println(fileChooser.getSelectedFile().getName());
+                TableView tv = new TableView(fileChooser.getSelectedFile().getName());
+                tv.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
+                tv.setVisible(true);
                 this.dispose();
                 break;
             case JFileChooser.CANCEL_OPTION:

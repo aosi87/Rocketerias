@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package controller;
+package model;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,7 +17,13 @@ import org.apache.pdfbox.util.PDFTextStripper;
  *
  * @author Isaac Alcocer <aosi87@gmail.com>
  */
-public class PDFUtils {
+public class PDFModel {
+
+    public PDFModel(File selectedFile) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+     public PDFModel(){}
     
         public void readPDF(){
         PDDocument pd;
@@ -47,7 +53,7 @@ public class PDFUtils {
      }
         
         public static void main(String[] args){
-            PDFUtils pdf = new PDFUtils();
+            PDFModel pdf = new PDFModel();
             pdf.readPDF();
         }
        
