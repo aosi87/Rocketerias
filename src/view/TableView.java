@@ -6,7 +6,7 @@
 
 package view;
 
-import controller.ViewsController;
+import controller.Controller;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -105,7 +105,7 @@ public class TableView extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Archivo", jScrollPane1);
 
-        jPanelManejoTabla.setLayout(new java.awt.GridLayout(1, 0));
+        jPanelManejoTabla.setLayout(new java.awt.GridLayout());
 
         jButtonFilas.setText("<html><center>Seleccionar<br>Filas/Columnas</center></html>");
         jButtonFilas.setMaximumSize(new java.awt.Dimension(87, 37));
@@ -128,7 +128,7 @@ public class TableView extends javax.swing.JFrame {
         jButton7.setText("<html><center>Adjuntar<br>Datos</center></html>");
         jPanelManejoTabla.add(jButton7);
 
-        jPanelManejoDatos.setLayout(new java.awt.GridLayout(1, 0));
+        jPanelManejoDatos.setLayout(new java.awt.GridLayout());
 
         jButton1.setText("<html><center>Borrar<br>Selección</center></html>");
         jPanelManejoDatos.add(jButton1);
@@ -208,7 +208,7 @@ public class TableView extends javax.swing.JFrame {
         int returnValue = fileChooser.showDialog(null,"Seleccionar");
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
-                this.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
+                this.setTableModel(new Controller(fileChooser.getSelectedFile()).fillTableVector());
                 break;
             case JFileChooser.CANCEL_OPTION:
                 System.err.println("CancelOption");

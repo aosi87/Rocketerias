@@ -6,7 +6,7 @@
 
 package view;
 
-import controller.ViewsController;
+import controller.Controller;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 
@@ -103,7 +103,7 @@ public class MainView extends javax.swing.JFrame {
                 //File selectedFile = fileChooser.getSelectedFile();
                 //System.out.println(fileChooser.getSelectedFile().getName());
                 TableView tv = new TableView(fileChooser.getSelectedFile().getName());
-                tv.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
+                tv.setTableModel(new Controller(fileChooser.getSelectedFile()).fillTableVector());
                 tv.setVisible(true);
                 this.dispose();
                 break;
