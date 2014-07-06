@@ -23,8 +23,8 @@ import model.PDFModel;
  */
 public class ViewsController {
     
-    private ExcelWordModel os = null;
-    private PDFModel ps = null;
+    private ExcelWordModel ewm = null;
+    private PDFModel pdf = null;
     private char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
                            'M','N','O','P','Q','R','S','T','U','V','X','Y','Z'};
     
@@ -37,38 +37,34 @@ public class ViewsController {
             String Excel2003 = "xls";
             String Excel2007 = "xlsx";
             String pdf = "pdf";
-            if (Excel2003.equalsIgnoreCase(extension) || Excel2007.equalsIgnoreCase(extension) ) {
-                os = new ExcelWordModel(selectedFile);
+            String docx = "docx";
+            String doc = "doc";
+            if (Excel2003.equalsIgnoreCase(extension) || Excel2007.equalsIgnoreCase(extension) 
+               || docx.equalsIgnoreCase(extension) || doc.equalsIgnoreCase(extension) ) {
+                  ewm = new ExcelWordModel(selectedFile);
               } else if (pdf.equalsIgnoreCase(extension)) {
-                ps = new PDFModel(selectedFile);
+                  this.pdf = new PDFModel(selectedFile);
               }
     }
     
     
-    public CustomTableModel fillTableArrayList(){
-        ArrayList triplete = os.createArrayList();
-        CustomTableModel dtm = new CustomTableModel();
-        dtm.setColumnCount((int)triplete.get(1));
-        dtm.setRowCount((int)triplete.get(0));
-        int n = 0;
-        for (int i = 0; i < (((ArrayList)triplete.get(2)).size()) ; i++){
-            dtm.setValueAt(((ArrayList)triplete.get(2)).get(i), n, (i)%(int)triplete.get(1));
-            System.out.println("celda: "+i +" en fila: "+n+" y columna: "+(i)%(int)triplete.get(1) + " Dato: "+((ArrayList)triplete.get(2)).get(i));     
-            if((i)%(int)triplete.get(1) == 0)
-                 n++;
-        }
-        //System.out.println("filas: " + dtm.getRowCount()+" Columnas: " + dtm.getColumnCount());
-    return dtm;
-    }
+    
     
     public CustomTableModel fillTableVector(){
-        Vector data = os.createDataVector();
+        Vector data = null;
+        if(ewm.getIsXSLX())
+            data = ewm.createDataVectorXLSX();
+        else 
+            data = ewm.createDataVectorXLS();
+        
         Vector headers = new Vector();
-        for (int i = 0; i < os.getNumColumns(); i++)
+        
+        for (int i = 0; i < ewm.getNumColumns(); i++)
             headers.add(this.indexColumn[i]);
+        
         CustomTableModel dtm = new CustomTableModel();
-        dtm.setColumnCount(os.getNumColumns());
-        dtm.setRowCount(os.getNumRows());
+        dtm.setColumnCount(ewm.getNumColumns());
+        dtm.setRowCount(ewm.getNumRows());
         dtm.setDataVector(data, headers);
     
     return dtm;

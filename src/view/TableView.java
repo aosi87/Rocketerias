@@ -82,12 +82,12 @@ public class TableView extends javax.swing.JFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Software Mineria");
         setMaximumSize(new java.awt.Dimension(1080, 720));
         setMinimumSize(new java.awt.Dimension(800, 600));
         setName("TableView"); // NOI18N
 
         jTabbedPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jTabbedPane1.setAutoscrolls(true);
         jTabbedPane1.setMaximumSize(new java.awt.Dimension(87, 37));
         jTabbedPane1.setMinimumSize(new java.awt.Dimension(87, 37));
         jTabbedPane1.setPreferredSize(new java.awt.Dimension(87, 37));
