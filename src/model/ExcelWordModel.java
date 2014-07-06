@@ -30,7 +30,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author Isaac Alcocer <aosi87@gmail.com>
  */
-public class ExcelModel {
+public class ExcelWordModel {
     
     private int numSheetTabs = 0;
     private int numRows = 0;
@@ -45,17 +45,17 @@ public class ExcelModel {
     private XSSFWorkbook xlsxWorkbook = null; //Office 2007 (xlsx)
     private XSSFSheet sheetXLSX = null;
     
-    public ExcelModel(){}
+    public ExcelWordModel(){}
     
-    public ExcelModel(HSSFWorkbook xlsFile){
+    public ExcelWordModel(HSSFWorkbook xlsFile){
         this.xlsWorkbook = xlsFile;
     }
     
-    public ExcelModel(XSSFWorkbook xlsxFile){
+    public ExcelWordModel(XSSFWorkbook xlsxFile){
         this.xlsxWorkbook = xlsxFile;
     }
     
-//    public ExcelModel(File file, JFrame frame){
+//    public ExcelWordModel(File file, JFrame frame){
 //            try {
 //            String fileToReadname = file.getName();
 //            String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
@@ -78,7 +78,7 @@ public class ExcelModel {
 //              }
 //    }
     
-    public ExcelModel(File file){
+    public ExcelWordModel(File file){
             try {
             String fileToReadname = file.getName();
             String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
@@ -331,7 +331,7 @@ public class ExcelModel {
         //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\plantilla salida.xlsx");
         //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Plantillas_salida_Listasprecios.xlsx");
         File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\EAW 2013 Distributor Pricelist AUGUST Update.xlsx"); 
-        ExcelModel ou = new ExcelModel(fileToRead);
+        ExcelWordModel ou = new ExcelWordModel(fileToRead);
         //ou.createArrayList();
         ou.createDataVector();
         ou.createArrayList();

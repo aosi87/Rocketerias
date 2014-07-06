@@ -11,9 +11,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import model.CustomModel;
-import model.ExcelModel;
+import model.CustomTableModel;
+import model.ExcelWordModel;
 import model.PDFModel;
 
 /**
@@ -22,7 +23,7 @@ import model.PDFModel;
  */
 public class ViewsController {
     
-    private ExcelModel os = null;
+    private ExcelWordModel os = null;
     private PDFModel ps = null;
     private char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
                            'M','N','O','P','Q','R','S','T','U','V','X','Y','Z'};
@@ -37,16 +38,16 @@ public class ViewsController {
             String Excel2007 = "xlsx";
             String pdf = "pdf";
             if (Excel2003.equalsIgnoreCase(extension) || Excel2007.equalsIgnoreCase(extension) ) {
-                os = new ExcelModel(selectedFile);
+                os = new ExcelWordModel(selectedFile);
               } else if (pdf.equalsIgnoreCase(extension)) {
                 ps = new PDFModel(selectedFile);
               }
     }
     
     
-    public CustomModel fillTableArrayList(){
+    public CustomTableModel fillTableArrayList(){
         ArrayList triplete = os.createArrayList();
-        CustomModel dtm = new CustomModel();
+        CustomTableModel dtm = new CustomTableModel();
         dtm.setColumnCount((int)triplete.get(1));
         dtm.setRowCount((int)triplete.get(0));
         int n = 0;
@@ -60,12 +61,12 @@ public class ViewsController {
     return dtm;
     }
     
-    public CustomModel fillTableVector(){
+    public CustomTableModel fillTableVector(){
         Vector data = os.createDataVector();
         Vector headers = new Vector();
         for (int i = 0; i < os.getNumColumns(); i++)
             headers.add(this.indexColumn[i]);
-        CustomModel dtm = new CustomModel();
+        CustomTableModel dtm = new CustomTableModel();
         dtm.setColumnCount(os.getNumColumns());
         dtm.setRowCount(os.getNumRows());
         dtm.setDataVector(data, headers);
@@ -73,6 +74,34 @@ public class ViewsController {
     return dtm;
     }
     
+    
+    public static CustomTableModel deleteColumn(JTable tabla, int[] indices){
+        DefaultTableModel dtm = (DefaultTableModel) tabla.getModel();
+        int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
+        Vector tableData = new Vector();
+        Vector d = null;
+        Vector names = new Vector();
+        
+        for (int i = 0 ; i< nCol ; i++)
+                names.add(tabla.getColumnName(i));
+        
+        for (int i = indices.length-1; i >=0 ; i--)
+            names.remove(i);
+        
+        for (int i = 0 ; i < nRow ; i++){
+            d = new Vector();
+            for (int j = 0 ; j < nCol ; j++)
+                d.add(dtm.getValueAt(i,j));
+        tableData.add(d);
+        }
+        
+        for(int index = 0; index < tabla.getModel().getRowCount(); index++)
+            for (int i = indices.length - 1; i >= 0; i--)
+                ((Vector)tableData.get(index)).remove(i);
+        
+ 
+        return new CustomTableModel(tableData, names);
+    }
     
     
 }

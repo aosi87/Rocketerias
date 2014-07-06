@@ -9,6 +9,7 @@ package view;
 import controller.ViewsController;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -96,8 +97,12 @@ public class MainView extends javax.swing.JFrame {
     private void jButtonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCargarActionPerformed
         JFileChooser fileChooser = new JFileChooser();
         //Agregamos un filtro de extensiones
-        //fileChooser.setFileFilter(new FileNameExtensionFilter("Doc - MS-Office 2003", "doc"));
-        int returnValue = fileChooser.showDialog(null,"Seleccionar");
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("MS-Word", "docx","doc"));
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Adobe-PDF", "pdf"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        
+        int returnValue = fileChooser.showDialog(this,"Seleccionar");
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();

@@ -7,11 +7,14 @@
 package view;
 
 import controller.ViewsController;
+import java.util.Arrays;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import model.CustomTableModel;
 
 /**
  *
@@ -32,7 +35,7 @@ public class TableView extends javax.swing.JFrame {
         this.jTabbedPane1.setTitleAt(0, path);
         this.setLocationRelativeTo(null);
         this.jPanelManejoTabla.setBorder(null);
-        this.jTable1.setCellSelectionEnabled(true);
+        //this.jTable1.setCellSelectionEnabled(true);
         this.jPanelManejoDatos.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder (),
                                                             "Manejo de Datos",
                                                             TitledBorder.CENTER,
@@ -40,16 +43,14 @@ public class TableView extends javax.swing.JFrame {
         this.jPanelManejoTabla.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder (),
                                                             "Manejo de Tabla",
                                                             TitledBorder.CENTER,
-                                                            TitledBorder.TOP));
-        //this.jTable1.setColumnSelectionAllowed(false);
-        //this.jTable1.setRowSelectionAllowed(false);
-        
-        
+                                                            TitledBorder.TOP)); 
     }
     
     public void setTableModel(DefaultTableModel model){
         this.jTable1.setModel(model);
         this.jTable1.setValueAt(true, 0, 0);
+        for(int i = 0;  i < this.jTable1.getColumnCount(); i++)
+            this.jTable1.getColumnModel().getColumn(i).setMinWidth(100);
         this.repaint();
     }
 
@@ -68,10 +69,10 @@ public class TableView extends javax.swing.JFrame {
         jPanelManejoTabla = new javax.swing.JPanel();
         jButtonFilas = new javax.swing.JButton();
         jButtonCabeceras = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
         jPanelManejoDatos = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuOpen = new javax.swing.JMenuItem();
@@ -86,6 +87,7 @@ public class TableView extends javax.swing.JFrame {
         setName("TableView"); // NOI18N
 
         jTabbedPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jTabbedPane1.setAutoscrolls(true);
         jTabbedPane1.setMaximumSize(new java.awt.Dimension(87, 37));
         jTabbedPane1.setMinimumSize(new java.awt.Dimension(87, 37));
         jTabbedPane1.setPreferredSize(new java.awt.Dimension(87, 37));
@@ -101,11 +103,14 @@ public class TableView extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jTable1.setAutoscrolls(false);
+        jTable1.setRowSelectionAllowed(false);
         jScrollPane1.setViewportView(jTable1);
 
         jTabbedPane1.addTab("Archivo", jScrollPane1);
 
-        jPanelManejoTabla.setLayout(new java.awt.GridLayout());
+        jPanelManejoTabla.setLayout(new java.awt.GridLayout(1, 0));
 
         jButtonFilas.setText("<html><center>Seleccionar<br>Filas/Columnas</center></html>");
         jButtonFilas.setMaximumSize(new java.awt.Dimension(87, 37));
@@ -125,16 +130,21 @@ public class TableView extends javax.swing.JFrame {
         });
         jPanelManejoTabla.add(jButtonCabeceras);
 
-        jButton7.setText("<html><center>Adjuntar<br>Datos</center></html>");
-        jPanelManejoTabla.add(jButton7);
-
-        jPanelManejoDatos.setLayout(new java.awt.GridLayout());
+        jPanelManejoDatos.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton1.setText("<html><center>Borrar<br>Selección</center></html>");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanelManejoDatos.add(jButton1);
 
         jButton2.setText("<html><center>Mantener<br>Seleccion</center></html>");
         jPanelManejoDatos.add(jButton2);
+
+        jButton7.setText("<html><center>Adjuntar<br>Datos</center></html>");
+        jPanelManejoDatos.add(jButton7);
 
         jMenu1.setText("Archivo");
 
@@ -171,14 +181,14 @@ public class TableView extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 190, Short.MAX_VALUE)
-                        .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 262, Short.MAX_VALUE)
+                        .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -204,7 +214,12 @@ public class TableView extends javax.swing.JFrame {
         // TODO add your handling code here:
         JFileChooser fileChooser = new JFileChooser();
         //Agregamos un filtro de extensiones
-        //fileChooser.setFileFilter(new FileNameExtensionFilter("Doc - MS-Office 2003", "doc"));
+        //this.showDetailsView(fileChooser.getComponents());
+        //Agregamos un filtro de extensiones
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("MS-Word", "docx","doc"));
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Adobe-PDF", "pdf"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         int returnValue = fileChooser.showDialog(null,"Seleccionar");
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
@@ -252,6 +267,27 @@ public class TableView extends javax.swing.JFrame {
             this.bot1 = false;
         }
     }//GEN-LAST:event_jButtonFilasActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        int[] indices = null;
+        if(this.jTable1.getRowSelectionAllowed()){
+            indices = this.jTable1.getSelectedRows();
+            Arrays.sort(indices);
+            for (int i = indices.length - 1; i >= 0; i--){
+                ((CustomTableModel)this.jTable1.getModel()).removeRow(indices[i]);
+                ((CustomTableModel)this.jTable1.getModel()).fireTableRowsDeleted(indices[i],indices[i]);
+            }
+        } else {
+            indices = this.jTable1.getSelectedColumns();
+            Arrays.sort(indices);
+            //for (int i = indices.length - 1; i >= 0; i--) 
+            //((CustomTableModel)this.jTable1.getModel()).setColumnCount(this.jTable1.getColumnCount()-1);
+            this.jTable1.setModel(ViewsController.deleteColumn(this.jTable1,indices));
+            this.repaint();
+        }
+        //fireTableRowsDeleted(indices[i], indices[i]);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

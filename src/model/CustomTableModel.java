@@ -13,16 +13,16 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Isaac Alcocer <aosi87@gmail.com>
  */
-public class CustomModel extends DefaultTableModel{
+public class CustomTableModel extends DefaultTableModel{
     private boolean isCellEditable;
     
     @SuppressWarnings("UseOfObsoleteCollectionType")
-    public CustomModel( Vector vector, Vector vector1){
+    public CustomTableModel( Vector vector, Vector vector1){
         super(vector, vector1);
         isCellEditable = false;
     }
 
-    public CustomModel() {
+    public CustomTableModel() {
         isCellEditable = false;
     }
 
