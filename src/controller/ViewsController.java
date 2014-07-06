@@ -20,16 +20,16 @@ import model.PDFModel;
  *
  * @author Isaac Alcocer <aosi87@gmail.com>
  */
-public class Controller {
+public class ViewsController {
     
     private ExcelModel os = null;
     private PDFModel ps = null;
     private char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
                            'M','N','O','P','Q','R','S','T','U','V','X','Y','Z'};
     
-    public Controller(){}
+    public ViewsController(){}
 
-    public Controller(File selectedFile) {
+    public ViewsController(File selectedFile) {
             String fileToReadname = selectedFile.getName();
             String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
                     + 1, fileToReadname.length());

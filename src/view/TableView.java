@@ -6,7 +6,7 @@
 
 package view;
 
-import controller.Controller;
+import controller.ViewsController;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -208,7 +208,7 @@ public class TableView extends javax.swing.JFrame {
         int returnValue = fileChooser.showDialog(null,"Seleccionar");
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
-                this.setTableModel(new Controller(fileChooser.getSelectedFile()).fillTableVector());
+                this.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
                 break;
             case JFileChooser.CANCEL_OPTION:
                 System.err.println("CancelOption");
