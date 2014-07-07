@@ -94,11 +94,13 @@ public class ExcelWordModel {
                 FileInputStream Excel2003FileToRead = new FileInputStream(file);
                 this.xlsWorkbook = new HSSFWorkbook(Excel2003FileToRead);
                 this.isXSLX = false;
+                this.numSheetTabs = this.xlsWorkbook.getNumberOfSheets();
                 //readXLSFile(Excel2003FileToRead);
               } else if (excel2007.equalsIgnoreCase(extension)) {
                 FileInputStream Excel2007FileToRead = new FileInputStream(file);
                 this.xlsxWorkbook = new XSSFWorkbook(Excel2007FileToRead);
                 this.isXSLX = true;
+                this.numSheetTabs = this.xlsxWorkbook.getNumberOfSheets();
                 //readXLSXFile(Excel2007FileToRead);
               }else if (docx.equalsIgnoreCase(extension)){
                   System.out.println("Docx");
@@ -218,10 +220,10 @@ public class ExcelWordModel {
             }
     }
     
-    public Vector createDataVectorXLSX(){
+    public Vector createDataVectorXLSX(int num){
         data = new Vector();
         Vector d = null;
-        this.sheetXLSX = this.xlsxWorkbook.getSheetAt(0);
+        this.sheetXLSX = this.xlsxWorkbook.getSheetAt(num);
         XSSFRow row;
         int rows = 0;
         System.err.println(sheetXLSX.getPhysicalNumberOfRows());
@@ -267,10 +269,10 @@ public class ExcelWordModel {
          return data;
 }
     
-    public Vector createDataVectorXLS(){
+    public Vector createDataVectorXLS(int num){
         data = new Vector();
         Vector d = null;
-        this.sheetXLS = this.xlsWorkbook.getSheetAt(0);
+        this.sheetXLS = this.xlsWorkbook.getSheetAt(num);
         HSSFRow row;
         int rows = 0;
         System.err.println(sheetXLS.getPhysicalNumberOfRows());
@@ -361,7 +363,11 @@ public class ExcelWordModel {
     /**
      * @return the nameSheetTab
      */
-    public String getNameSheetTab() {
+    public String getNameSheetTab(int i) {
+        if(this.isXSLX)
+            this.nameSheetTab = this.xlsxWorkbook.getSheetName(i);
+        else 
+            this.nameSheetTab = this.xlsWorkbook.getSheetName(i);
         return nameSheetTab;
     }
 

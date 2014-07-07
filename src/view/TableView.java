@@ -22,7 +22,8 @@ import model.CustomTableModel;
  */
 public class TableView extends javax.swing.JFrame {
     
-    private boolean bot1 = false;
+    private boolean bot1;
+    private String path;
     /**
      * Creates new form TableView
      */
@@ -32,10 +33,17 @@ public class TableView extends javax.swing.JFrame {
     
     public TableView(String path) {
         initComponents();
-        this.jTabbedPane1.setTitleAt(0, path);
+        //this.jTabbedPane1.setTitleAt(0, path);
+        this.path = path;
         this.setLocationRelativeTo(null);
         this.jPanelManejoTabla.setBorder(null);
-        //this.jTable1.setCellSelectionEnabled(true);
+        this.jTable1.setRowSelectionAllowed(true);
+        this.jTable1.setRowSelectionInterval(0, 0);
+        this.bot1 = true;
+        this.jTabbedPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder (),
+                                                            path,
+                                                            TitledBorder.CENTER,
+                                                            TitledBorder.TOP));
         this.jPanelManejoDatos.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder (),
                                                             "Manejo de Datos",
                                                             TitledBorder.CENTER,
@@ -46,12 +54,24 @@ public class TableView extends javax.swing.JFrame {
                                                             TitledBorder.TOP)); 
     }
     
+    
+    void setSheetName(String s) {
+        this.jTabbedPane1.setTitleAt(0, s);
+    }
+    
     public void setTableModel(DefaultTableModel model){
         this.jTable1.setModel(model);
-        this.jTable1.setValueAt(true, 0, 0);
+        //this.jTable1.setValueAt(true, 0, 0);
         for(int i = 0;  i < this.jTable1.getColumnCount(); i++)
             this.jTable1.getColumnModel().getColumn(i).setMinWidth(100);
         this.repaint();
+    }
+    
+    private boolean isARowSelected() {
+        for (int i=0; i< this.jTable1.getRowCount(); i++)
+            if(this.jTable1.isRowSelected(i))
+                return true;
+        return false;
     }
 
     /**
@@ -87,7 +107,6 @@ public class TableView extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(800, 600));
         setName("TableView"); // NOI18N
 
-        jTabbedPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jTabbedPane1.setMaximumSize(new java.awt.Dimension(87, 37));
         jTabbedPane1.setMinimumSize(new java.awt.Dimension(87, 37));
         jTabbedPane1.setPreferredSize(new java.awt.Dimension(87, 37));
@@ -112,7 +131,7 @@ public class TableView extends javax.swing.JFrame {
 
         jPanelManejoTabla.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButtonFilas.setText("<html><center>Seleccionar<br>Filas/Columnas</center></html>");
+        jButtonFilas.setText("<html><center>Selección<br>por Fila</center></html>");
         jButtonFilas.setMaximumSize(new java.awt.Dimension(87, 37));
         jButtonFilas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -141,9 +160,19 @@ public class TableView extends javax.swing.JFrame {
         jPanelManejoDatos.add(jButton1);
 
         jButton2.setText("<html><center>Mantener<br>Seleccion</center></html>");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         jPanelManejoDatos.add(jButton2);
 
         jButton7.setText("<html><center>Adjuntar<br>Datos</center></html>");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
         jPanelManejoDatos.add(jButton7);
 
         jMenu1.setText("Archivo");
@@ -171,6 +200,11 @@ public class TableView extends javax.swing.JFrame {
         jMenu2.setText("Ayuda");
 
         jMenuItem1.setText("Acerca de");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem1);
 
         jMenuBar1.add(jMenu2);
@@ -186,7 +220,7 @@ public class TableView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 262, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 294, Short.MAX_VALUE)
                         .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -223,7 +257,27 @@ public class TableView extends javax.swing.JFrame {
         int returnValue = fileChooser.showDialog(null,"Seleccionar");
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
-                this.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
+                //this.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
+                ViewsController vc = new ViewsController(fileChooser.getSelectedFile());
+                Object[] opc;
+                String s = vc.getNameSheet(0);
+                int index = 0;
+                if( vc.getNumSheet() > 1){
+                    opc = new Object[vc.getNumSheet()];
+                    for(int i = 0; i < vc.getNumSheet();i++)
+                        opc[i]=vc.getNameSheet(i);
+                    s = (String)JOptionPane.showInputDialog(this,
+                                            "Seleccione la Hoja de Calculo:\n",
+                                            "Se encontraron varias Hojas.",
+                                            JOptionPane.QUESTION_MESSAGE,
+                                            null,opc,null);
+                    //System.out.println(s);
+                    for(int i = 0; i < vc.getNumSheet(); i++)
+                        if(s.equalsIgnoreCase(opc[i].toString()))
+                            index = i;
+                }
+                this.setSheetName(s);
+                this.setTableModel(vc.fillTableVector(index));
                 break;
             case JFileChooser.CANCEL_OPTION:
                 System.err.println("CancelOption");
@@ -240,31 +294,38 @@ public class TableView extends javax.swing.JFrame {
     private void jButtonCabecerasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCabecerasActionPerformed
         // TODO add your handling code here:
         int index = this.jTable1.getSelectedRow();
-        if(!this.jTable1.getColumnSelectionAllowed()){
+        if(this.jTable1.getRowSelectionAllowed() && this.isARowSelected()){
         for(int i = 0 ; i < this.jTable1.getColumnCount(); i++)
-         jTable1.getColumnModel().getColumn(i).setHeaderValue(this.jTable1.getValueAt(index, i).toString());
-        this.repaint();
-        }
-        else JOptionPane.showMessageDialog(this,
-                "Esta opción funciona con seleccion de fila.\nFavor de cambiar el tipo de selección.",
-                "Se encontro una columna!!!",
+            jTable1.getColumnModel().getColumn(i).setHeaderValue(this.jTable1.getValueAt(index, i).toString());
+             this.repaint();
+//         if(jTable1.isRowSelected(i)){
+//            jTable1.getColumnModel().getColumn(i).setHeaderValue(this.jTable1.getValueAt(index, i).toString());
+//            this.repaint();
+//         } else{ JOptionPane.showMessageDialog(this,
+//                "Favor de seleccionar una fila\n Si la seleccion es multiple,\nse tomara la primera fila seleccionada.",
+//                "No se encontraron filas seleccionadas.",
+//                JOptionPane.ERROR_MESSAGE); break;}
+        } else JOptionPane.showMessageDialog(this,
+                "Esta opción funciona con la selección de al menos una fila\n"
+                        + "\"Seleccion por Fila\" debe estar activado para realizar esta acción.",
+                "No se encontro fila para selección.",
                 JOptionPane.ERROR_MESSAGE);
     }//GEN-LAST:event_jButtonCabecerasActionPerformed
 
     private void jButtonFilasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFilasActionPerformed
         // TODO add your handling code here:
-        if(this.bot1 == false){
-        //this.jTable1.setCellSelectionEnabled(false);    
-        this.jTable1.setColumnSelectionAllowed(false);
-        this.jTable1.setRowSelectionAllowed(true);
-        this.jButtonFilas.setText("<html><center>Selección<br>por Fila</center></html>");
-        this.bot1 = true;
-        } else {
-            //this.jTable1.setCellSelectionEnabled(true);    
-            this.jTable1.setColumnSelectionAllowed(true);
-            this.jTable1.setRowSelectionAllowed(false);
-            this.jButtonFilas.setText("<html><center>Selección<br>por Columna</center></html>");
-            this.bot1 = false;
+        if(this.bot1 == true){   
+        this.jTable1.setColumnSelectionAllowed(true);
+        this.jTable1.setRowSelectionAllowed(false);
+        this.jButtonFilas.setText("<html><center>Selección<br>por Columna</center></html>");
+        this.setTitle("Software Mineria- Seleccionando por Columna");
+        this.bot1 = false;
+        } else { 
+            this.jTable1.setColumnSelectionAllowed(false);
+            this.jTable1.setRowSelectionAllowed(true);
+            this.jButtonFilas.setText("<html><center>Selección<br>por Fila</center></html>");
+            this.bot1 = true;
+        this.setTitle("Software Mineria- Seleccionando por Fila");    
         }
     }//GEN-LAST:event_jButtonFilasActionPerformed
 
@@ -288,6 +349,37 @@ public class TableView extends javax.swing.JFrame {
         }
         //fireTableRowsDeleted(indices[i], indices[i]);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(this,
+                "Datos guardados satisfactoriamente",
+                "Guardado completo",
+                JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        Object[] possibilities = {"ham", "spam", "yam"};
+        String s = (String)JOptionPane.showInputDialog(
+                    this,
+                    "Seleccione la Hoja de Calculo:\n",
+                    "Se encontraron varias Hojas.",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    possibilities,
+                    null);
+        System.out.println(s);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(this,
+                "NO FUE PENAAAL!!!!!",
+                "NOOOOOOO",
+                JOptionPane.INFORMATION_MESSAGE);
+        
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

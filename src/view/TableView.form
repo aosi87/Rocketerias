@@ -39,6 +39,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Acerca de"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -81,7 +84,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="jPanelManejoTabla" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="262" max="32767" attributes="0"/>
+                      <EmptySpace pref="294" max="32767" attributes="0"/>
                       <Component id="jPanelManejoDatos" min="-2" pref="225" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jTabbedPane1" max="32767" attributes="0"/>
@@ -107,11 +110,6 @@
   <SubComponents>
     <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
       <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.BevelBorderInfo">
-            <BevelBorder/>
-          </Border>
-        </Property>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[87, 37]"/>
         </Property>
@@ -167,7 +165,7 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="jButtonFilas">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;center&gt;Seleccionar&lt;br&gt;Filas/Columnas&lt;/center&gt;&lt;/html&gt;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;center&gt;Selecci&#xf3;n&lt;br&gt;por Fila&lt;/center&gt;&lt;/html&gt;"/>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[87, 37]"/>
             </Property>
@@ -208,11 +206,17 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;center&gt;Mantener&lt;br&gt;Seleccion&lt;/center&gt;&lt;/html&gt;"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButton7">
           <Properties>
             <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;center&gt;Adjuntar&lt;br&gt;Datos&lt;/center&gt;&lt;/html&gt;"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton7ActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

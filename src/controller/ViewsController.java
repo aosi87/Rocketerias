@@ -47,15 +47,22 @@ public class ViewsController {
               }
     }
     
+    public int getNumSheet(){
+        return ewm.getNumSheetTabs();
+    }
+    
+    public String getNameSheet(int i){
+        return ewm.getNameSheetTab(i);
+    }   
     
     
     
-    public CustomTableModel fillTableVector(){
+    public CustomTableModel fillTableVector(int sheetNumber){
         Vector data = null;
         if(ewm.getIsXSLX())
-            data = ewm.createDataVectorXLSX();
+            data = ewm.createDataVectorXLSX(sheetNumber);
         else 
-            data = ewm.createDataVectorXLS();
+            data = ewm.createDataVectorXLS(sheetNumber);
         
         Vector headers = new Vector();
         

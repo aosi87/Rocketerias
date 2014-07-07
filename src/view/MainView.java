@@ -8,6 +8,7 @@ package view;
 
 import controller.ViewsController;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -102,13 +103,33 @@ public class MainView extends javax.swing.JFrame {
         fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
-        int returnValue = fileChooser.showDialog(this,"Seleccionar");
+        int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
                 //System.out.println(fileChooser.getSelectedFile().getName());
                 TableView tv = new TableView(fileChooser.getSelectedFile().getName());
-                tv.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
+                ViewsController vc = new ViewsController(fileChooser.getSelectedFile());
+                Object[] opc;
+                String s = vc.getNameSheet(0);
+                int index = 0;
+                if( vc.getNumSheet() > 1){
+                    opc = new Object[vc.getNumSheet()];
+                    for(int i = 0; i < vc.getNumSheet();i++)
+                        opc[i]=vc.getNameSheet(i);
+                    s = (String)JOptionPane.showInputDialog(this,
+                                            "Seleccione la Hoja de Calculo:\n",
+                                            "Se encontraron varias Hojas.",
+                                            JOptionPane.QUESTION_MESSAGE,
+                                            null,opc,null);
+                    if(s == null)
+                        break;//s = vc.getNameSheet(0);
+                    for(int i = 0; i < vc.getNumSheet(); i++)
+                        if(s.equalsIgnoreCase(opc[i].toString()))
+                            index = i;
+                }
+                tv.setSheetName(s);
+                tv.setTableModel(vc.fillTableVector(index));
                 tv.setVisible(true);
                 this.dispose();
                 break;
