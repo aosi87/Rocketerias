@@ -1,4 +1,4 @@
-/*
+/* Demo Roketeria para el software mineria de datos
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 import javax.swing.ProgressMonitorInputStream;
@@ -263,7 +265,7 @@ public class ExcelWordModel {
                     //d.add( "\n" );
                     data.add( d );
          } 
-         //printVector(data);
+         printVector(data);
          this.setNumColumns(rows);
          this.setNumRows(sheetXLSX.getPhysicalNumberOfRows());
          return data;
@@ -312,7 +314,7 @@ public class ExcelWordModel {
                     //d.add( "\n" );
                     data.add( d );
          } 
-         //printVector(data);
+         printVector(data);
          this.setNumColumns(rows);
          this.setNumRows(sheetXLS.getPhysicalNumberOfRows());
          return data;
@@ -470,11 +472,11 @@ public class ExcelWordModel {
         }   
     } 
 
-  /* public static void main(String[] args) {
+   public static void main(String[] args) {
         //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\plantilla salida.xlsx");
         //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Plantillas_salida_Listasprecios.xlsx");
-        //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\EAW 2013 Distributor Pricelist AUGUST Update.xlsx");
-        File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Statistics 6 T-test.xlsx");
+        File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\EAW 2013 Distributor Pricelist AUGUST Update.xlsx");
+        //File fileToRead = new File("\\Users\\Manuu Alcocer\\Downloads\\Statistics 6 T-test.xlsx");
         ExcelWordModel ou;
 //        JFrame jf = new JFrame();
 //        jf.setSize(400, 400);
@@ -483,6 +485,6 @@ public class ExcelWordModel {
 //        ou = new ExcelWordModel(fileToRead, jf);
         //ou.createArrayList();
         ou = new ExcelWordModel(fileToRead);
-        ou.createDataVectorXLSX();
-    }*/
+        ou.readExcel();
+    }
 }

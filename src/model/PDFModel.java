@@ -9,9 +9,13 @@ package model;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.util.PDFTextStripperByArea;
 
 /**
  *
@@ -30,7 +34,7 @@ public class PDFModel {
         BufferedWriter wr;
         
         try {
-         File input = new File("C:\\Invoice.pdf");  // The PDF file from where you would like to extract
+         File input = new File("C:\\Low Noise Ag_AgCl Electric Field Sensor System for Marine CSEM and MT Applications");  // The PDF file from where you would like to extract
          File output = new File("C:\\SampleText.txt"); // The text file where you are going to store the extracted data
          pd = PDDocument.load(input);
          System.out.println(pd.getNumberOfPages());
@@ -52,9 +56,20 @@ public class PDFModel {
         } 
      }
         
+        public void read(String path) throws IOException{
+            PDDocument pdf = PDDocument.load(new File(path));
+            PDFTextStripper stripper = new PDFTextStripper();
+            String plainText = stripper.getText(pdf);
+            System.out.print(plainText);
+        }
+        
         public static void main(String[] args){
             PDFModel pdf = new PDFModel();
-            pdf.readPDF();
+        try {
+            pdf.read("\\Users\\Manuu Alcocer\\Downloads\\Low Noise Ag_AgCl Electric Field Sensor System for Marine CSEM and MT Applications.pdf");
+        } catch (IOException ex) {
+            Logger.getLogger(PDFModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         }
        
     

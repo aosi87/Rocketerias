@@ -79,7 +79,7 @@ public class ViewsController {
     
     
     public static CustomTableModel deleteColumn(JTable tabla, int[] indices){
-        DefaultTableModel dtm = (DefaultTableModel) tabla.getModel();
+        CustomTableModel dtm = (CustomTableModel) tabla.getModel();
         int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
         Vector tableData = new Vector();
         Vector d = null;
