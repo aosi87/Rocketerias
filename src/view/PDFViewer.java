@@ -406,12 +406,12 @@ public class PDFViewer extends JFrame
         file.add(quitAction);
         mb.add(file);
         JMenu view = new JMenu("View");
-        JMenu zoom = new JMenu("Zoom");
+        /*JMenu zoom = new JMenu("Zoom");
         zoom.add(zoomInAction);
         zoom.add(zoomOutAction);
         zoom.add(fitInWindowAction);
-        zoom.setEnabled(false);
-        view.add(zoom);
+        zoom.setEnabled(true);///////////false
+        view.add(zoom);*/
         view.add(fullScreenAction);
 
         if (doThumb) {
@@ -917,7 +917,7 @@ public class PDFViewer extends JFrame
      */
     public void doFitInWindow() {
         if (fspp == null) {
-            page.useZoomTool(true);//////False
+            page.useZoomTool(false);
             page.setClip(null);
         }
     }
@@ -1163,7 +1163,9 @@ public class PDFViewer extends JFrame
     /**
      * Someone changed the selection of the outline tree.  Go to the new
      * page.
+     * @param e
      */
+    @Override
     public void valueChanged(TreeSelectionEvent e) {
         if (e.isAddedPath()) {
             OutlineNode node = (OutlineNode) e.getPath().getLastPathComponent();
@@ -1196,6 +1198,13 @@ public class PDFViewer extends JFrame
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
+        }
+    }
+    
+    class PagePanelFixed extends com.sun.pdfview.PagePanel {
+        
+        public PagePanelFixed(){
+            super();
         }
     }
 }

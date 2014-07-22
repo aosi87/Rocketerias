@@ -167,7 +167,7 @@ public class PDFView extends javax.swing.JFrame {
             public void run() {
                 try {
                     //PDFRenderer pdfR = new PDFRenderer();
-                    PDDocument pdf = PDDocument.load(new File("\\Users\\Manuu Alcocer\\Downloads\\Low Noise Ag_AgCl Electric Field Sensor System for Marine CSEM and MT Applications.pdf"));
+                    PDDocument pdf = PDDocument.load(new File("C:\\Users\\Elpapo\\Downloads\\GuiaAcuerdo286Bachillerato2014.pdf"));
                     pdf.close();
                     //System.out.printf(pdf.getDocument().getHeaderString());
                     //new PDFView(pdf).setVisible(true);
