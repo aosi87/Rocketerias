@@ -102,7 +102,8 @@ public class PDFViewer extends JFrame
     /** The thumbnail display */
     ThumbPanel thumbs;
     /** The page display */
-    PagePanel page;
+    //PagePanel page;
+    PagePanelFixed page;//Se modifico para poder obtener las coordenadas a analizar
     /** The full screen page display, or null if not in full screen mode */
     PagePanel fspp;
 
@@ -312,25 +313,39 @@ public class PDFViewer extends JFrame
         doThumb = useThumbs;
         init();
     }
+    
+    public PDFViewer(){
+        super(TITLE);
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent evt) {
+                doQuit();
+            }
+        });
+        doThumb = false;
+        init();
+    }
 
     /**
      * Initialize this PDFViewer by creating the GUI.
      */
     protected void init() {
-        page = new PagePanel();
+        page = new PagePanelFixed();
         page.addKeyListener(this);
 
         if (doThumb) {
             split = new JSplitPane(split.HORIZONTAL_SPLIT);
-            split.addPropertyChangeListener(split.DIVIDER_LOCATION_PROPERTY,
+            split.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
                     thumbAction);
             split.setOneTouchExpandable(true);
             thumbs = new ThumbPanel(null);
             thumbscroll = new JScrollPane(thumbs,
-                    thumbscroll.VERTICAL_SCROLLBAR_ALWAYS,
+                    thumbscroll.VERTICAL_SCROLLBAR_AS_NEEDED,
                     thumbscroll.HORIZONTAL_SCROLLBAR_NEVER);
             split.setLeftComponent(thumbscroll);
             split.setRightComponent(page);
+            split.setResizeWeight(0.10);
             getContentPane().add(split, BorderLayout.CENTER);
         } else {
             getContentPane().add(page, BorderLayout.CENTER);
@@ -423,10 +438,12 @@ public class PDFViewer extends JFrame
         setJMenuBar(mb);
         setEnabling();
         pack();
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screen.width - getWidth()) / 2;
-        int y = (screen.height - getHeight()) / 2;
-        setLocation(x, y);
+        //Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        //int x = (screen.width - getWidth()) / 2;
+        //int y = (screen.height - getHeight()) / 2;
+        //setLocation(x, y);
+        this.setSize(800, 600);
+        this.setLocationRelativeTo(null);
         if (SwingUtilities.isEventDispatchThread()) {
             setVisible(true);
         } else {
@@ -1198,13 +1215,6 @@ public class PDFViewer extends JFrame
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-        }
-    }
-    
-    class PagePanelFixed extends com.sun.pdfview.PagePanel {
-        
-        public PagePanelFixed(){
-            super();
         }
     }
 }

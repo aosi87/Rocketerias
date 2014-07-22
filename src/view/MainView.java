@@ -7,6 +7,9 @@
 package view;
 
 import controller.ViewsController;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -104,12 +107,13 @@ public class MainView extends javax.swing.JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
+        if(!ViewsController.isExcel(fileChooser.getSelectedFile().getName())){
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
                 //System.out.println(fileChooser.getSelectedFile().getName());
-                TableView tv = new TableView(fileChooser.getSelectedFile().getName());
                 ViewsController vc = new ViewsController(fileChooser.getSelectedFile());
+                TableView tv = new TableView(fileChooser.getSelectedFile().getName());
                 Object[] opc;
                 String s = vc.getNameSheet(0);
                 int index = 0;
@@ -142,6 +146,16 @@ public class MainView extends javax.swing.JFrame {
             default:
                 System.err.println("Ocurrio un problema"+fileChooser.toString());
                 break;
+        }
+        } else {
+            PDFViewer pdf = new PDFViewer(true);
+            try {
+                pdf.openFile(fileChooser.getSelectedFile());
+            } catch (IOException ex) {
+                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            pdf.setVisible(true);
+            this.dispose();
         }
     }//GEN-LAST:event_jButtonCargarActionPerformed
 
