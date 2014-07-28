@@ -8,8 +8,8 @@ package view;
 
 import controller.ViewsController;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -116,7 +116,10 @@ public class MainView extends javax.swing.JFrame {
                 ViewsController vc = new ViewsController(fileChooser.getSelectedFile());
                 TableView tv = new TableView(fileChooser.getSelectedFile().getName());
                 Object[] opc;
-                String s = vc.getNameSheet(0);
+                String s;
+                
+                System.err.println("num: " + vc.getNumSheet());
+                 s = vc.getNameSheet(0);
                 int index = 0;
                 if( vc.getNumSheet() > 1){
                     opc = new Object[vc.getNumSheet()];
@@ -153,7 +156,7 @@ public class MainView extends javax.swing.JFrame {
             try {
                 pdf.openFile(fileChooser.getSelectedFile());
             } catch (IOException ex) {
-                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
             }
             pdf.setVisible(true);
             this.dispose();

@@ -26,15 +26,16 @@ import model.PDFModel;
  */
 public class ViewsController {
     
-    public static String pathExcelSalida = "";
+    public static final String pathExcelSalida = ClassLoader.getSystemResource("templates/PlantillaSalida.xlsx").getPath();
+    public static String pathExcelSalidaUsuario = "";
     private ExcelWordModel ewm = null;
     private PDFModel pdfM = null;
-    private char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
+    private final char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
                            'M','N','O','P','Q','R','S','T','U','V','X','Y','Z'};
     public static boolean isPDF = false;
     
     public ViewsController(String pathSalida){
-        pathExcelSalida = pathSalida;
+        pathExcelSalidaUsuario = pathSalida;
     }
 
     public ViewsController(File selectedFile) {
@@ -48,7 +49,7 @@ public class ViewsController {
             String doc = "doc";
             if (Excel2003.equalsIgnoreCase(extension) || Excel2007.equalsIgnoreCase(extension) 
                || docx.equalsIgnoreCase(extension) || doc.equalsIgnoreCase(extension) ) {
-                  ewm = new ExcelWordModel(selectedFile);
+                ewm = new ExcelWordModel(selectedFile);
               } else if (pdf.equalsIgnoreCase(extension)) {
                   this.pdfM = new PDFModel(selectedFile);
               }
@@ -158,8 +159,8 @@ public class ViewsController {
     public static void saveData(int indexToCompare, JTable tabla) throws Exception{
         Vector data = getDataFromTable(tabla);
         //System.out.println("Salvando datos."+ data);
-        //new ExcelWordModel().saveExcel();
-        sortVector(indexToCompare,data);
+        new ExcelWordModel().saveExcel(data);
+        //sortVector(indexToCompare,data);
     }
     
     public static Vector sortVector(int indexToCompare, Vector data){
