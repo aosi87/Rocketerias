@@ -8,6 +8,8 @@ package view;
 
 import controller.ViewsController;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -351,7 +353,12 @@ public class TableView extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            ViewsController.saveData(0,this.jTable1);
+        } catch (Exception ex) {
+            Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+        }
         JOptionPane.showMessageDialog(this,
                 "Datos guardados satisfactoriamente",
                 "Guardado completo",

@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -23,13 +26,16 @@ import model.PDFModel;
  */
 public class ViewsController {
     
+    public static String pathExcelSalida = "";
     private ExcelWordModel ewm = null;
     private PDFModel pdfM = null;
     private char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
                            'M','N','O','P','Q','R','S','T','U','V','X','Y','Z'};
     public static boolean isPDF = false;
     
-    public ViewsController(){}
+    public ViewsController(String pathSalida){
+        pathExcelSalida = pathSalida;
+    }
 
     public ViewsController(File selectedFile) {
             String fileToReadname = selectedFile.getName();
@@ -133,6 +139,51 @@ public class ViewsController {
     public boolean isPDF() {
         return ViewsController.isPDF;
     }
+    
+    public static Vector getDataFromTable(JTable tabla){
+        CustomTableModel dtm = (CustomTableModel) tabla.getModel();
+        int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
+        Vector tableData = new Vector();
+        Vector d = null;
+        
+        for (int i = 0 ; i < nRow ; i++){
+            d = new Vector();
+            for (int j = 0 ; j < nCol ; j++)
+                d.add(dtm.getValueAt(i,j));
+        tableData.add(d);
+        }
+        return tableData;
+    }
+    
+    public static void saveData(int indexToCompare, JTable tabla) throws Exception{
+        Vector data = getDataFromTable(tabla);
+        //System.out.println("Salvando datos."+ data);
+        //new ExcelWordModel().saveExcel();
+        sortVector(indexToCompare,data);
+    }
+    
+    public static Vector sortVector(int indexToCompare, Vector data){
+        //List newData = new Vector();
+        //data.sort(Comparator.naturalOrder());
+        Collections.sort(data, new Comparator<Vector<String>>(){
+          @Override  
+          public int compare(Vector<String> v1, Vector<String> v2) {
+              return v1.get(indexToCompare).compareTo(v2.get(indexToCompare)); //If you order by 2nd element in row
+            }});
+        //System.out.print("Ordenando.."+data);
+        return null;//(Vector)newData;
+    }
+    
+    public static boolean isString(String str){
+        try {
+            Double.parseDouble(str);
+            return false;
+        } catch (NumberFormatException e) {
+            return true;
+        }   
+    }
+    
+    
     
     
 }

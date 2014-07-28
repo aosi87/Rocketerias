@@ -6,6 +6,7 @@
 
 package model;
 
+import controller.ViewsController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -319,6 +320,10 @@ public class ExcelWordModel {
          this.setNumRows(sheetXLS.getPhysicalNumberOfRows());
          return data;
 }
+    
+    public void saveExcel() throws IOException{
+        XSSFWorkbook excelSalida = new XSSFWorkbook();
+    }
 
     /**
      * @return the numSheetTabs

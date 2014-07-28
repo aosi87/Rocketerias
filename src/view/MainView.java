@@ -107,6 +107,7 @@ public class MainView extends javax.swing.JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
+        if(fileChooser.getSelectedFile() != null)
         if(!ViewsController.isExcel(fileChooser.getSelectedFile().getName())){
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
