@@ -6,7 +6,6 @@
 
 package model;
 
-import controller.ViewsController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,20 +14,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
-import javax.swing.JFrame;
-import javax.swing.ProgressMonitorInputStream;
-import junit.framework.Assert;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -45,13 +49,13 @@ public class ExcelWordModel {
     private int numColumns = 0;
     private String nameSheetTab = "";
     private Vector data = null;
-    private ProgressMonitorInputStream Excel2003FileToReadPM;
-    private ProgressMonitorInputStream Excel2007FileToReadPM;
+    //private ProgressMonitorInputStream Excel2003FileToReadPM;
+    //private ProgressMonitorInputStream Excel2007FileToReadPM;
     
     private HSSFWorkbook xlsWorkbook = null; //Office 2003 (xls)
-    private HSSFSheet sheetXLS = null;
+    //private HSSFSheet sheetXLS = null;
     private XSSFWorkbook xlsxWorkbook = null; //Office 2007 (xlsx)
-    private XSSFSheet sheetXLSX = null;
+    //private XSSFSheet sheetXLSX = null;
     
     public ExcelWordModel(){}
     
@@ -62,7 +66,7 @@ public class ExcelWordModel {
     public ExcelWordModel(XSSFWorkbook xlsxFile){
         this.xlsxWorkbook = xlsxFile;
     }
-    
+    /*
     public ExcelWordModel(File file, JFrame frame){
             try {
             String fileToReadname = file.getName();
@@ -87,7 +91,7 @@ public class ExcelWordModel {
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
               }
-    }
+    }*/
     
     public ExcelWordModel(File file){
             try {
@@ -231,7 +235,8 @@ public class ExcelWordModel {
     public Vector createDataVectorXLSX(int num){
         data = new Vector();
         Vector d = null;
-        this.sheetXLSX = this.xlsxWorkbook.getSheetAt(num);
+        XSSFSheet sheetXLSX = null;
+        sheetXLSX = this.xlsxWorkbook.getSheetAt(num);
         XSSFRow row;
         int rows = 0;
         System.err.println(sheetXLSX.getPhysicalNumberOfRows());
@@ -282,7 +287,8 @@ public class ExcelWordModel {
     public Vector createDataVectorXLS(int num){
         data = new Vector();
         Vector d = null;
-        this.sheetXLS = this.xlsWorkbook.getSheetAt(num);
+        HSSFSheet sheetXLS= null;
+        sheetXLS = this.xlsWorkbook.getSheetAt(num);
         HSSFRow row;
         int rows = 0;
         System.err.println(sheetXLS.getPhysicalNumberOfRows());
@@ -332,18 +338,21 @@ public class ExcelWordModel {
     
     public void saveExcel(Vector tableData) throws IOException{
         //System.out.println(ViewsController.pathExcelSalida);
-        Vector h = new Vector();
-        Vector f = new Vector();
-        Vector salida;
-        File fis = new File(ViewsController.pathExcelSalida);
-        this.xlsxWorkbook = new XSSFWorkbook(new FileInputStream(fis));
-        Vector dataExcel = this.createDataVectorXLSX(0);
-        this.fillVectorsSalidaCore(dataExcel, h, f);
-        if(!new File("C:\\Users\\Elpapo\\Desktop\\Demo.xlsx").exists())
-         salida = this.mergeVectoresInicial(tableData, h, f);
-        else salida = this.mergeVectoresExistente(tableData, dataExcel, f);
-        salida.trimToSize();
-        this.createDataSalida(salida);
+        //Vector h = new Vector();
+        //Vector f = new Vector();
+        //Vector salida;
+        //File fis = new File(ViewsController.pathExcelSalida);
+        //this.xlsxWorkbook = new XSSFWorkbook(new FileInputStream(fis));
+        this.fillWorkBook();
+        //this.createDataSalida();
+        //this.copyHeaderFormat();
+        //Vector dataExcel = this.createDataVectorXLSX(0);
+        //this.fillVectorsSalidaCore(dataExcel, h, f);
+        //if(!new File("C:\\Users\\Elpapo\\Desktop\\Demo.xlsx").exists())
+        //salida = this.mergeVectoresInicial(tableData, h, f);
+        //else salida = this.mergeVectoresExistentes(tableData, dataExcel, f);
+        //salida.trimToSize();
+        //this.createDataSalida(salida);
         //this.printVector(headers);
         //this.printVector(dataExcel);
         //this.printVector(footer);
@@ -351,7 +360,34 @@ public class ExcelWordModel {
         //this.readExcel();
     }
     
-    private Vector mergeVectoresExistente(Vector tabla, Vector excel, Vector footer){
+    private void fillWorkBook(){
+        try {
+            //this.xlsxWorkbook.setSheetName(0, "Proshop");
+           SXSSFWorkbook wb = new SXSSFWorkbook(500);
+            
+           this.createHeader(wb);
+           for(int i = 0; i < 10; i++)
+               wb.getSheetAt(0).createRow(i+6);
+           this.createFooter(wb);
+           this.setColumnWidth(wb.getSheetAt(0));
+           this.setCombinedCells(wb.getSheetAt(0));
+           //sheet.shiftRows(5, 6, 10);
+                                            //col, fil
+           wb.getSheetAt(0).createFreezePane(0, 6);
+            
+           this.createDataSalida(wb);
+           
+        } catch (IOException ex) {
+            Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void setColor(CellStyle cs, IndexedColors color){
+        cs.setFillForegroundColor(color.index);
+        cs.setFillPattern(CellStyle.SOLID_FOREGROUND);
+    }
+    
+    private Vector mergeVectoresExistentes(Vector tabla, Vector excel, Vector footer){
         Vector salida = new Vector();
         for(int i = 0; i < excel.size()-7; i++)
             salida.add(excel.get(i));
@@ -364,7 +400,7 @@ public class ExcelWordModel {
     }
     
     private void createDataSalida(Vector salida) throws FileNotFoundException, IOException{
-    SXSSFWorkbook wb = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
+        SXSSFWorkbook wb = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
         Sheet sh = wb.createSheet();
         Vector d = new Vector(); 
         for(int rownum = 0; rownum < salida.size(); rownum++){
@@ -396,35 +432,44 @@ public class ExcelWordModel {
         wb.dispose();
         System.out.println("Success");
     }
-
     
-    private void createDataSalida1(Vector salida){
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet("Sample sheet");
-        Vector d = null;
-        int rownum = 0;
-        for (int i = 0 ; i < salida.size() ; i++) {
-            Row row = sheet.createRow(rownum++);
-            d = (Vector)salida.get(i);
-            int cellnum = 0;
-            for (int j = 0 ; j < d.size(); j++) {
-                Cell cell = row.createCell(cellnum++);
-                cell.setCellValue(d.get(j).toString());
-            }
-        }
- 
-        try {
-            FileOutputStream out = 
-                new FileOutputStream(new File("C:\\Users\\Elpapo\\Desktop\\Demo.xlsx"));
-            workbook.write(out);
-            out.close();
-            System.out.println("Excel written successfully..");
-     
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void createDataSalida(SXSSFWorkbook xlsxWB) throws FileNotFoundException, IOException{
+//        SXSSFWorkbook wb = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
+//        Sheet sh = wb.createSheet();
+//        wb.setSheetName(0, xlsxWB.getSheetName(0));
+//        XSSFSheet oldsh  = xlsxWB.getSheetAt(0);
+//        Row d , row = null; 
+//        Cell cell = null;
+//        //for(int rownum = 0; rownum <  6; rownum++){
+//        for(int rownum = 0; rownum <  oldsh.getPhysicalNumberOfRows(); rownum++){
+//            row = sh.createRow(rownum);
+//            d = oldsh.getRow(rownum);
+//            for(int cellnum = 0; cellnum < d.getPhysicalNumberOfCells() ; cellnum++){
+//                 cell = row.createCell(cellnum);
+//                //String address = new CellReference(cell.toString()).formatAsString();
+//                if(d.getCell(cellnum) != null){
+//                cell.setCellValue(d.getCell(cellnum).toString());
+//                cell.setCellStyle(d.getCell(cellnum).getCellStyle());
+//                } else cell.setCellValue(Cell.CELL_TYPE_BLANK);
+//            }
+//            // manually control how rows are flushed to disk 
+//           if(rownum % 100 == 0) {
+//                ((SXSSFSheet)sh).flushRows(100); // retain 100 last rows and flush all others
+//
+//                // ((SXSSFSheet)sh).flushRows() is a shortcut for ((SXSSFSheet)sh).flushRows(0),
+//                // this method flushes all rows
+//           }
+//
+//        }
+
+        
+        FileOutputStream out = new FileOutputStream("C:\\Users\\Elpapo\\Desktop\\Demo.xlsx");
+        xlsxWB.write(out);
+        out.close();
+
+        // dispose of temporary files backing this workbook on disk
+        xlsxWB.dispose();
+        System.out.println("Success");
     }
     
     private Vector mergeVectoresInicial(Vector tabla, Vector headers, Vector footer){
@@ -543,17 +588,17 @@ public class ExcelWordModel {
 
     /**
      * @return the sheetXLS
-     */
+     *
     public HSSFSheet getSheetXLS() {
         return sheetXLS;
-    }
+    }*/
 
     /**
      * @param sheetXLS the sheetXLS to set
-     */
+     *
     public void setSheetXLS(HSSFSheet sheetXLS) {
         this.sheetXLS = sheetXLS;
-    }
+    }*/
 
     /**
      * @return the xlsxWorkbook
@@ -571,17 +616,17 @@ public class ExcelWordModel {
 
     /**
      * @return the sheetXLSX
-     */
+     *
     public XSSFSheet getSheetXLSX() {
         return sheetXLSX;
-    }
+    }*/
 
     /**
      * @param sheetXLSX the sheetXLS to set
-     */
+     *
     public void setSheetXLSX(XSSFSheet sheetXLSX) {
         this.sheetXLSX = sheetXLSX;
-    }
+    }*/
     
     public void printArrayList(ArrayList a){
                              //filas   columnas
@@ -636,4 +681,202 @@ public class ExcelWordModel {
             //Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-    }}
+    }
+   
+    private void setCombinedCells(Sheet sheet){
+            int rows = sheet.getPhysicalNumberOfRows();
+                                //rowFrom,rowTo,colFrom,colTo
+            sheet.addMergedRegion(new CellRangeAddress(3,3,2,6));
+            sheet.addMergedRegion(new CellRangeAddress(4,4,2,6));
+            sheet.addMergedRegion(new CellRangeAddress(rows-1,rows-1,0,11));
+            sheet.addMergedRegion(new CellRangeAddress(rows-2,rows-2,0,11));
+            sheet.addMergedRegion(new CellRangeAddress(rows-3,rows-3,0,11));
+            sheet.addMergedRegion(new CellRangeAddress(rows-4,rows-4,0,11));
+            sheet.addMergedRegion(new CellRangeAddress(rows-5,rows-5,0,11));
+            sheet.addMergedRegion(new CellRangeAddress(rows-6,rows-6,0,11));
+            sheet.addMergedRegion(new CellRangeAddress(rows-7,rows-7,0,11));            
+    }
+
+    private void setColumnWidth(Sheet sheet) {
+        final int colWidth = 544;
+        sheet.setColumnWidth(0, colWidth*16);
+        sheet.setColumnWidth(1, colWidth*13);
+        for(int i = 2; i < 14; i++)
+        sheet.setColumnWidth(i, colWidth*5);
+    }
+    
+    private void createHeader(SXSSFWorkbook wb){
+            String cabecera[] = { 
+               "Modelo",
+                "Descripción",
+                "No.Parte",
+                "Codigo de Barras",
+                "Unidad de Medida",
+                "Costo",
+                "Precio Publico",
+                "Precio Contratista",
+                "Precio Mayoreo",
+                "Precio Super Mayoreo",
+                "Stock",
+                "Imagen",
+                "Giro",
+                "Marca"      };
+            
+            wb.createSheet("ProShop");
+            Font font = wb.createFont();
+            Sheet sheet = wb.getSheetAt(0);//this.xlsxWorkbook.getSheetAt(0);
+            Row row = null;
+            Cell c = null;
+            XSSFCellStyle cs = (XSSFCellStyle)wb.createCellStyle();
+            this.setColor(cs, IndexedColors.GREY_25_PERCENT);
+            
+            for(int i = 0; i < 5; i++){
+             row = sheet.createRow(i);
+             for (int j = 0 ; j < 14; j++){
+              c = row.createCell(j);
+              c.setCellStyle(cs);
+              c.setCellType(Cell.CELL_TYPE_STRING);
+              c.setCellValue("");
+             }
+            }
+            //Fill cells manually -first text
+            row = sheet.getRow(3);
+            c = row.getCell(2);
+            c.setCellValue("Lista De precios de Rocketerias Distribuidores S.A de C.V.");
+            cs.setAlignment(HorizontalAlignment.CENTER);
+            cs.setVerticalAlignment(VerticalAlignment.CENTER);
+            font.setColor(IndexedColors.RED.index);
+            //next text
+            row = sheet.getRow(4);
+            c = row.getCell(2);
+            c.setCellValue("Confidencial.");
+            cs = (XSSFCellStyle)wb.createCellStyle();
+            cs.setAlignment(HorizontalAlignment.CENTER);
+            cs.setVerticalAlignment(VerticalAlignment.CENTER);
+            this.setColor(cs, IndexedColors.GREY_25_PERCENT);
+            cs.setFont(font);
+            c.setCellStyle(cs);
+            //Create headers
+            row = sheet.createRow(5);
+            cs = (XSSFCellStyle)wb.createCellStyle();
+            this.setColor(cs, IndexedColors.BLACK);
+            cs.setAlignment(HorizontalAlignment.CENTER);
+            cs.setVerticalAlignment(VerticalAlignment.CENTER);
+            cs.setWrapText(true);
+            font = wb.createFont();
+            font.setColor(IndexedColors.WHITE.getIndex());
+            font.setFontHeightInPoints((short)9);
+            font.setFontName("Arial Bold");
+            cs.setFont(font);
+            for(int i = 0; i < cabecera.length ; i++){
+                c = row.createCell(i);
+                 c.setCellType(Cell.CELL_TYPE_STRING);
+                 c.setCellValue(cabecera[i]);
+                 c.setCellStyle(cs);
+            } 
+    }
+    
+    private void createFooter(SXSSFWorkbook wb){
+            
+            Sheet sheet = wb.getSheetAt(0);
+            Row row = null;
+            XSSFCellStyle cs = null;
+            Font font = null;
+            Cell c = null;
+            int rows = sheet.getPhysicalNumberOfRows();
+            
+        //create footer
+            row = sheet.createRow(rows++);
+            //c = row.createCell(0);
+            cs = (XSSFCellStyle)wb.createCellStyle();
+            this.setColor(cs, IndexedColors.RED);
+            cs.setAlignment(HorizontalAlignment.CENTER);
+            cs.setVerticalAlignment(VerticalAlignment.CENTER);
+            cs.setWrapText(true);
+            font = wb.createFont();
+            font.setColor(IndexedColors.WHITE.getIndex());
+            font.setFontHeightInPoints((short)11);
+            font.setFontName("Arial Bold");
+            cs.setFont(font);
+            for(int i = 0; i < 14 ;i++ ){
+             c = row.createCell(i);
+             c.setCellStyle(cs);
+            } 
+            c = row.getCell(0);
+            c.setCellValue("PRECIOS EN (Euros, Dolares, pesos, Libra esterlina) + IVA");
+            c.setCellType(Cell.CELL_TYPE_STRING);
+            
+            //next data
+            row = sheet.createRow(rows++);
+            cs = (XSSFCellStyle)wb.createCellStyle();
+            //this.setColor(cs, IndexedColors.RED);
+            cs.setAlignment(HorizontalAlignment.CENTER);
+            cs.setVerticalAlignment(VerticalAlignment.CENTER);
+            cs.setWrapText(true);
+            for(int i = 0; i < 14 ;i++ ){
+             c = row.createCell(i);
+             c.setCellStyle(cs);
+            }
+            c = row.getCell(0);
+            c.setCellValue("ROCKETERIAS DISTRIBUIDORES, S. A. de C. V.");
+            c.setCellType(Cell.CELL_TYPE_STRING);
+            
+            //next data
+            row = sheet.createRow(rows++);
+            for(int i = 0; i < 14 ;i++ ){
+             c = row.createCell(i);
+             c.setCellStyle(cs);
+            }
+            c = row.getCell(0);
+            c.setCellValue("Oficina Matriz: Calle 21 No. 802 X 64 Col. Jardines de Mérida");
+            c.setCellType(Cell.CELL_TYPE_STRING);
+            
+            //next data
+            row = sheet.createRow(rows++);
+            for(int i = 0; i < 14 ;i++ ){
+             c = row.createCell(i);
+             c.setCellStyle(cs);
+            }
+            c = row.getCell(0);
+            c.setCellValue(" Tel: (52) (999) 930-06-00 ");
+            c.setCellType(Cell.CELL_TYPE_STRING);
+            
+            //next data
+            row = sheet.createRow(rows++);
+            for(int i = 0; i < 14 ;i++ ){
+             c = row.createCell(i);
+             c.setCellStyle(cs);
+            }
+            c = row.getCell(0);
+            c.setCellValue("Mérida, Yucatán, México  C. P. 97135");
+            c.setCellType(Cell.CELL_TYPE_STRING);
+            
+            //next data
+            row = sheet.createRow(rows++);
+            for(int i = 0; i < 14 ;i++ ){
+             c = row.createCell(i);
+             c.setCellStyle(cs);
+            }
+            c = row.getCell(0);
+            c.setCellValue("info@rocketerias.com.mx");
+            c.setCellType(Cell.CELL_TYPE_STRING);
+                        
+            //next data
+            row = sheet.createRow(rows++);
+            for(int i = 0; i < 14 ;i++ ){
+             c = row.createCell(i);
+             c.setCellStyle(cs);
+            }
+            c = row.getCell(0);
+            c.setCellValue("*Precios sujetos a cambios sin previo aviso.");
+            c.setCellType(Cell.CELL_TYPE_STRING);
+        
+    }
+    
+    private void setThinBorder(CellStyle style){
+        style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+        style.setBorderTop(XSSFCellStyle.BORDER_THIN);
+        style.setBorderRight(XSSFCellStyle.BORDER_THIN);
+        style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+    }
+}
