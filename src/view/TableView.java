@@ -6,7 +6,7 @@
 
 package view;
 
-import controller.ViewsController;
+import controller.ViewController;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -259,8 +259,8 @@ public class TableView extends javax.swing.JFrame {
         int returnValue = fileChooser.showDialog(null,"Seleccionar");
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
-                //this.setTableModel(new ViewsController(fileChooser.getSelectedFile()).fillTableVector());
-                ViewsController vc = new ViewsController(fileChooser.getSelectedFile());
+                //this.setTableModel(new ViewController(fileChooser.getSelectedFile()).fillTableVector());
+                ViewController vc = new ViewController(fileChooser.getSelectedFile());
                 Object[] opc;
                 String s = vc.getNameSheet(0);
                 int index = 0;
@@ -346,7 +346,7 @@ public class TableView extends javax.swing.JFrame {
             Arrays.sort(indices);
             //for (int i = indices.length - 1; i >= 0; i--) 
             //((CustomTableModel)this.jTable1.getModel()).setColumnCount(this.jTable1.getColumnCount()-1);
-            this.jTable1.setModel(ViewsController.deleteColumn(this.jTable1,indices));
+            this.jTable1.setModel(ViewController.deleteColumn(this.jTable1,indices));
             this.repaint();
         }
         //fireTableRowsDeleted(indices[i], indices[i]);
@@ -355,7 +355,7 @@ public class TableView extends javax.swing.JFrame {
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         try {
             // TODO add your handling code here:
-            ViewsController.saveData(0,this.jTable1);
+            ViewController.saveData(0,this.jTable1);
         } catch (Exception ex) {
             Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
         }

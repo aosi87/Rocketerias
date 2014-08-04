@@ -6,10 +6,8 @@
 
 package view;
 
-import controller.ViewsController;
+import controller.ViewController;
 import java.io.IOException;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -108,12 +106,12 @@ public class MainView extends javax.swing.JFrame {
         
         int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
         if(fileChooser.getSelectedFile() != null)
-        if(!ViewsController.isExcel(fileChooser.getSelectedFile().getName())){
+        if(!ViewController.isExcel(fileChooser.getSelectedFile().getName())){
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
                 //System.out.println(fileChooser.getSelectedFile().getName());
-                ViewsController vc = new ViewsController(fileChooser.getSelectedFile());
+                ViewController vc = new ViewController(fileChooser.getSelectedFile());
                 TableView tv = new TableView(fileChooser.getSelectedFile().getName());
                 Object[] opc;
                 String s;

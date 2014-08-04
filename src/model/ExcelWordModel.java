@@ -20,15 +20,24 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -109,8 +118,14 @@ public class ExcelWordModel {
                 this.numSheetTabs = this.xlsWorkbook.getNumberOfSheets();
                 //readXLSFile(Excel2003FileToRead);
               } else if (excel2007.equalsIgnoreCase(extension)) {
-                FileInputStream Excel2007FileToRead = new FileInputStream(file);
-                this.xlsxWorkbook = new XSSFWorkbook(Excel2007FileToRead);
+                OPCPackage pkg = null;
+                try {
+                    pkg = OPCPackage.open(file);
+                } catch (InvalidFormatException ex) {
+                    System.err.println("FormatoDesconocido");
+                    Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                this.xlsxWorkbook = new XSSFWorkbook(pkg);//new XSSFWorkbook(Excel2007FileToRead);
                 this.isXSLX = true;
                 this.numSheetTabs = this.xlsxWorkbook.getNumberOfSheets();
                 //readXLSXFile(Excel2007FileToRead);
@@ -295,8 +310,8 @@ public class ExcelWordModel {
          for ( int i = 0; i < sheetXLS.getPhysicalNumberOfRows(); i ++ ){
           d = new Vector();
           row = sheetXLS.getRow( i );
-          if(rows < row.getPhysicalNumberOfCells())
-           rows = row.getPhysicalNumberOfCells();
+          //if(rows < row.getPhysicalNumberOfCells())
+          // rows = row.getPhysicalNumberOfCells();
           for ( int j = 0; j < row.getPhysicalNumberOfCells(); j++ ){
               HSSFCell cell = row.getCell( j );
               if ( cell == null)
@@ -331,7 +346,7 @@ public class ExcelWordModel {
                     data.add( d );
          } 
          //printVector(data);
-         this.setNumColumns(rows);
+         this.setNumColumns(sheetXLS.getRow(0).getPhysicalNumberOfCells());
          this.setNumRows(sheetXLS.getPhysicalNumberOfRows());
          return data;
 }
@@ -374,7 +389,7 @@ public class ExcelWordModel {
            //sheet.shiftRows(5, 6, 10);
                                             //col, fil
            wb.getSheetAt(0).createFreezePane(0, 6);
-            
+           this.addImage(wb);
            this.createDataSalida(wb);
            
         } catch (IOException ex) {
@@ -878,5 +893,34 @@ public class ExcelWordModel {
         style.setBorderTop(XSSFCellStyle.BORDER_THIN);
         style.setBorderRight(XSSFCellStyle.BORDER_THIN);
         style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
+    }
+    
+    private void addImage(SXSSFWorkbook wb) throws IOException{
+         Sheet sheet = wb.getSheetAt(0);
+         //FileInputStream obtains input bytes from the image file
+         FileInputStream inputStream = new FileInputStream("resources/gfx/logo.png");
+         //Get the contents of an InputStream as a byte[].
+         byte[] bytes = IOUtils.toByteArray(inputStream);
+         //Adds a picture to the workbook
+         int pictureIdx = wb.addPicture(bytes, wb.PICTURE_TYPE_PNG);
+         //close the input stream
+         inputStream.close();
+ 
+        //Returns an object that handles instantiating concrete classes
+         CreationHelper helper = wb.getCreationHelper();
+ 
+        //Creates the top-level drawing patriarch.
+         Drawing drawing = sheet.createDrawingPatriarch();
+ 
+        //Create an anchor that is attached to the worksheet
+         ClientAnchor anchor = helper.createClientAnchor();
+         //set top-left corner for the image
+         anchor.setCol1(0);
+         anchor.setRow1(0);
+ 
+         //Creates a picture
+         Picture pict = drawing.createPicture(anchor, pictureIdx);
+         //Reset the image to the original size
+         pict.resize(.5);
     }
 }

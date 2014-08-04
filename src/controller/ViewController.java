@@ -24,9 +24,9 @@ import model.PDFModel;
  *
  * @author Isaac Alcocer <aosi87@gmail.com>
  */
-public class ViewsController {
+public class ViewController {
     
-    public static final String pathExcelSalida = ClassLoader.getSystemResource("templates/PlantillaSalida.xlsx").getPath();
+    public static final String pathExcelSalida = "resources/templates/plantillasalida.xlsx";
     public static String pathExcelSalidaUsuario = "";
     private ExcelWordModel ewm = null;
     private PDFModel pdfM = null;
@@ -34,11 +34,13 @@ public class ViewsController {
                            'M','N','O','P','Q','R','S','T','U','V','X','Y','Z'};
     public static boolean isPDF = false;
     
-    public ViewsController(String pathSalida){
+    public ViewController(String pathSalida){
         pathExcelSalidaUsuario = pathSalida;
     }
+    
+    public ViewController(){}
 
-    public ViewsController(File selectedFile) {
+    public ViewController(File selectedFile) {
             String fileToReadname = selectedFile.getName();
             String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
                     + 1, fileToReadname.length());
@@ -67,12 +69,12 @@ public class ViewsController {
             if (Excel2003.equalsIgnoreCase(extension) || Excel2007.equalsIgnoreCase(extension) 
                || docx.equalsIgnoreCase(extension) || doc.equalsIgnoreCase(extension) ) {
                   //ewm = new ExcelWordModel(selectedFile);
-                ViewsController.isPDF = false;
+                ViewController.isPDF = false;
               } else if (pdf.equalsIgnoreCase(extension)) {
                   //this.pdf = new PDFModel(selectedFile);
-                  ViewsController.isPDF = true;
+                  ViewController.isPDF = true;
               }
-            return isPDF;
+            return ViewController.isPDF;
     }
     
     public int getNumSheet(){
@@ -138,7 +140,7 @@ public class ViewsController {
      * @return the isPDF
      */
     public boolean isPDF() {
-        return ViewsController.isPDF;
+        return ViewController.isPDF;
     }
     
     public static Vector getDataFromTable(JTable tabla){
