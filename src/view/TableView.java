@@ -7,7 +7,10 @@
 package view;
 
 import controller.ViewController;
+import java.awt.Toolkit;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -31,10 +34,12 @@ public class TableView extends javax.swing.JFrame {
      */
     public TableView() {
         initComponents();
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/gfx/icon.png"));
     }
     
     public TableView(String path) {
         initComponents();
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/gfx/icon.png"));
         //this.jTabbedPane1.setTitleAt(0, path);
         this.path = path;
         this.setLocationRelativeTo(null);
@@ -93,7 +98,7 @@ public class TableView extends javax.swing.JFrame {
         jButtonCabeceras = new javax.swing.JButton();
         jPanelManejoDatos = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jButtonSeleccionColumn = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -161,13 +166,13 @@ public class TableView extends javax.swing.JFrame {
         });
         jPanelManejoDatos.add(jButton1);
 
-        jButton2.setText("<html><center>Mantener<br>Seleccion</center></html>");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButtonSeleccionColumn.setText("<html><center>Ordenar <br>Columnas<br></center></html>");
+        jButtonSeleccionColumn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButtonSeleccionColumnActionPerformed(evt);
             }
         });
-        jPanelManejoDatos.add(jButton2);
+        jPanelManejoDatos.add(jButtonSeleccionColumn);
 
         jButton7.setText("<html><center>Adjuntar<br>Datos</center></html>");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -260,9 +265,33 @@ public class TableView extends javax.swing.JFrame {
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //this.setTableModel(new ViewController(fileChooser.getSelectedFile()).fillTableVector());
-                ViewController vc = new ViewController(fileChooser.getSelectedFile());
+                ViewController vc = null;
+                try {
+                    vc = new ViewController(fileChooser.getSelectedFile());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this,
+                                            "No fue posible obtener el archivo."
+                                          + "\nVerifique que el archivo no este siendo usado por\n"
+                                          + "otra persona/programa, este en vista protegida y/ó\n"
+                                          + "cambiado de directorio/nombre.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                    break;
+                    //this.jMenuOpenActionPerformed(evt);
+                    //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (OutOfMemoryError oome) {
+                    JOptionPane.showMessageDialog(this,
+                                            "El archivo es demasiado greande para leerlo"
+                                          + "\ncon menos de 2Gigs de memoria utilizable."
+                                          + "\nSe recomienda dividir el archivo en archivos\n"
+                                          + "mas pequeños para su manejo optimo.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                    break;
+                } 
                 Object[] opc;
                 String s = vc.getNameSheet(0);
+                if(vc.getNameSheet(0)!=null){
                 int index = 0;
                 if( vc.getNumSheet() > 1){
                     opc = new Object[vc.getNumSheet()];
@@ -280,15 +309,20 @@ public class TableView extends javax.swing.JFrame {
                 }
                 this.setSheetName(s);
                 this.setTableModel(vc.fillTableVector(index));
+                }
                 break;
             case JFileChooser.CANCEL_OPTION:
-                System.err.println("CancelOption");
+                //System.err.println("CancelOption");
                 break;
             case JFileChooser.ERROR_OPTION:
-                System.err.println("ErrorDesconocido");
+                JOptionPane.showMessageDialog(this,
+                                            "No fue posible obtener el archivo,",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                //System.err.println("ErrorDesconocido");
                 break;
             default:
-                System.err.println("Ocurrio un problema"+fileChooser.toString());
+                //System.err.println("Ocurrio un problema"+fileChooser.toString());
                 break;
         }
     }//GEN-LAST:event_jMenuOpenActionPerformed
@@ -296,10 +330,13 @@ public class TableView extends javax.swing.JFrame {
     private void jButtonCabecerasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCabecerasActionPerformed
         // TODO add your handling code here:
         int index = this.jTable1.getSelectedRow();
+        Vector names = new Vector();
         if(this.jTable1.getRowSelectionAllowed() && this.isARowSelected()){
         for(int i = 0 ; i < this.jTable1.getColumnCount(); i++)
-            jTable1.getColumnModel().getColumn(i).setHeaderValue(this.jTable1.getValueAt(index, i).toString());
-             this.repaint();
+            //jTable1.getColumnModel().getColumn(i).setHeaderValue(this.jTable1.getValueAt(index, i).toString());
+            names.add(this.jTable1.getValueAt(index, i).toString());
+            ((CustomTableModel)this.jTable1.getModel()).setColumnIdentifiers(names);
+            this.repaint();
 //         if(jTable1.isRowSelected(i)){
 //            jTable1.getColumnModel().getColumn(i).setHeaderValue(this.jTable1.getValueAt(index, i).toString());
 //            this.repaint();
@@ -346,8 +383,9 @@ public class TableView extends javax.swing.JFrame {
             Arrays.sort(indices);
             //for (int i = indices.length - 1; i >= 0; i--) 
             //((CustomTableModel)this.jTable1.getModel()).setColumnCount(this.jTable1.getColumnCount()-1);
-            this.jTable1.setModel(ViewController.deleteColumn(this.jTable1,indices));
-            this.repaint();
+            //this.jTable1.setModel(ViewController.deleteColumn(this.jTable1,indices));
+            ViewController.deleteColumn(jTable1, indices);
+            //this.repaint();
         }
         //fireTableRowsDeleted(indices[i], indices[i]);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -356,16 +394,22 @@ public class TableView extends javax.swing.JFrame {
         try {
             // TODO add your handling code here:
             ViewController.saveData(0,this.jTable1);
-        } catch (Exception ex) {
-            Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(this,
                 "Datos guardados satisfactoriamente",
                 "Guardado completo",
                 JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                                            "No fue posible guardar el archivo.\n"
+                                          + "Verifique si el archivo no este siendo\n"
+                                          + "usado por otra persona u otro programa.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+            //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton7ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButtonSeleccionColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSeleccionColumnActionPerformed
         // TODO add your handling code here:
         Object[] possibilities = {"ham", "spam", "yam"};
         String s = (String)JOptionPane.showInputDialog(
@@ -376,8 +420,8 @@ public class TableView extends javax.swing.JFrame {
                     null,
                     possibilities,
                     null);
-        System.out.println(s);
-    }//GEN-LAST:event_jButton2ActionPerformed
+        //System.out.println(s);
+    }//GEN-LAST:event_jButtonSeleccionColumnActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
@@ -390,10 +434,10 @@ public class TableView extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButtonCabeceras;
     private javax.swing.JButton jButtonFilas;
+    private javax.swing.JButton jButtonSeleccionColumn;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
