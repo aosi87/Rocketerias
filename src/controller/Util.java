@@ -478,7 +478,7 @@ import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTTwoCellAn
           public static void main(String args[]){
               FileOutputStream fos = null;
                 try {
-                    ExcelWordModel ewm = new ExcelWordModel(new File(ViewController.pathExcelSalida));
+                    ExcelWordModel ewm = new ExcelWordModel(new File(ViewController.pathExcelSalidaDefault+"/Roketerias.xlsx"));
                     ExcelWordModel ewm2 = new ExcelWordModel(new XSSFWorkbook());
                     ewm2.getXLSXWorkbook().createSheet("Works");
                     Util.copySheets(ewm2.getXLSXWorkbook().getSheetAt(0), ewm.getXLSXWorkbook().getSheetAt(0));

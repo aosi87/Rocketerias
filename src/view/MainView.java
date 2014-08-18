@@ -6,8 +6,15 @@
 
 package view;
 
+import com.alee.laf.WebLookAndFeel;
 import controller.ViewController;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -26,7 +33,21 @@ public class MainView extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        
+        this.jLabelLogo.setText("");
+        try {
+            this.jLabelLogo.setIcon(new ImageIcon(this.loadImageIntoJLABEL()));
+        } catch (IOException ex) {
+            //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private BufferedImage loadImageIntoJLABEL() throws IOException{
+            BufferedImage bi=new BufferedImage(jLabelLogo.getWidth(),jLabelLogo.getHeight(),BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g=bi.createGraphics();
+            Image img = ImageIO.read(new File("resources/gfx/logoMining.png"));
+            g.drawImage(img, 0, 0, jLabelLogo.getWidth(), jLabelLogo.getHeight(), null);
+            g.dispose();
+            return bi;
     }
     
     /**
@@ -38,18 +59,27 @@ public class MainView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         jLabelLogo = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jButtonCargar = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
         jButtonExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Cargar lista de productos.");
+        setIconImage(new ImageIcon("resources/gfx/icon.png").getImage());
         setMaximumSize(new java.awt.Dimension(400, 300));
         setPreferredSize(new java.awt.Dimension(300, 200));
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
         jLabelLogo.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jLabelLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelLogo.setText("Logo");
+        jPanel1.add(jLabelLogo, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
         jButtonCargar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jButtonCargar.setText("Cargar archivo");
@@ -58,6 +88,9 @@ public class MainView extends javax.swing.JFrame {
                 jButtonCargarActionPerformed(evt);
             }
         });
+        jPanel2.add(jButtonCargar);
+
+        jPanel3.setLayout(new java.awt.GridLayout(1, 0));
 
         jButtonExit.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jButtonExit.setText("Salir");
@@ -66,30 +99,31 @@ public class MainView extends javax.swing.JFrame {
                 jButtonExitActionPerformed(evt);
             }
         });
+        jPanel3.add(jButtonExit);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabelLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButtonCargar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonExit, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonCargar, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                    .addComponent(jButtonExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -111,13 +145,34 @@ public class MainView extends javax.swing.JFrame {
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
                 //System.out.println(fileChooser.getSelectedFile().getName());
-                ViewController vc = new ViewController(fileChooser.getSelectedFile());
+                ViewController vc = null;
+                try {
+                    vc = new ViewController(fileChooser.getSelectedFile());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this,
+                                            "Ocurrio un error al obtener el Archivo.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                    break;
+                    //this.jButtonCargarActionPerformed(evt);
+                    //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (OutOfMemoryError oome) {
+                    JOptionPane.showMessageDialog(this,
+                                            "El archivo es demasiado greande para leerlo"
+                                          + "\ncon menos de 2Gigs de memoria utilizable."
+                                          + "\nSe recomienda dividir el archivo en archivos\n"
+                                          + "mas pequeños para su manejo optimo.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
                 TableView tv = new TableView(fileChooser.getSelectedFile().getName());
                 Object[] opc;
-                String s;
+                String s = null;
                 
-                System.err.println("num: " + vc.getNumSheet());
+                //System.err.println("num: " + vc.getNumSheet());
                  s = vc.getNameSheet(0);
+                if(s != null){
                 int index = 0;
                 if( vc.getNumSheet() > 1){
                     opc = new Object[vc.getNumSheet()];
@@ -137,19 +192,26 @@ public class MainView extends javax.swing.JFrame {
                 tv.setSheetName(s);
                 tv.setTableModel(vc.fillTableVector(index));
                 tv.setVisible(true);
-                this.dispose();
+                this.dispose(); 
+                }
                 break;
             case JFileChooser.CANCEL_OPTION:
-                System.err.println("CancelOption");
+                //System.err.println("CancelOption");
                 break;
             case JFileChooser.ERROR_OPTION:
-                System.err.println("ErrorDesconocido");
+                JOptionPane.showMessageDialog(this,
+                                            "No fue posible obtener el archivo."
+                                          + "\nVerifique que el archivo no este siendo usado por\n"
+                                          + "otra persona/programa, este en vista protegida y/ó\n"
+                                          + "cambiado de directorio/nombre.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                //System.err.println("ErrorDesconocido");
                 break;
             default:
-                System.err.println("Ocurrio un problema"+fileChooser.toString());
+                //System.err.println("Ocurrio un problema"+fileChooser.toString());
                 break;
-        }
-        } else {
+         } } else {
             PDFViewer pdf = new PDFViewer(true);
             try {
                 pdf.openFile(fileChooser.getSelectedFile());
@@ -171,9 +233,7 @@ public class MainView extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        // Set WebLAF look and feel 
-        //WebLookAndFeel.install();
-        
+               
         /*
         try { 
          // Setting up WebLookAndFeel style
@@ -192,23 +252,24 @@ public class MainView extends javax.swing.JFrame {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
-                    //javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     break;
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            //java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            //java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            //java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            //java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>*/
         
-        
+        // Set WebLAF look and feel 
+         WebLookAndFeel.install();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
@@ -222,6 +283,9 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton jButtonCargar;
     private javax.swing.JButton jButtonExit;
     private javax.swing.JLabel jLabelLogo;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     // End of variables declaration//GEN-END:variables
 
 }

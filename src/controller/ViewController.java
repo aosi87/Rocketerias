@@ -26,8 +26,9 @@ import model.PDFModel;
  */
 public class ViewController {
     
-    public static final String pathExcelSalida = "resources/templates/plantillasalida.xlsx";
-    public static String pathExcelSalidaUsuario = "";
+    public static final String pathExcelTemplate = "resources/templates/plantillasalida.xlsx";
+    public static String pathExcelSalidaDefault = System.getProperty("user.home") + "/Desktop";
+    public static String pathExcelSalidaUsuario ="";
     private ExcelWordModel ewm = null;
     private PDFModel pdfM = null;
     private final char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
@@ -40,7 +41,7 @@ public class ViewController {
     
     public ViewController(){}
 
-    public ViewController(File selectedFile) {
+    public ViewController(File selectedFile) throws IOException {
             String fileToReadname = selectedFile.getName();
             String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
                     + 1, fileToReadname.length());
@@ -53,7 +54,7 @@ public class ViewController {
                || docx.equalsIgnoreCase(extension) || doc.equalsIgnoreCase(extension) ) {
                 ewm = new ExcelWordModel(selectedFile);
               } else if (pdf.equalsIgnoreCase(extension)) {
-                  this.pdfM = new PDFModel(selectedFile);
+                  //this.pdfM = new PDFModel(selectedFile);
               }
     }
     
@@ -108,18 +109,21 @@ public class ViewController {
     }
     
     
-    public static CustomTableModel deleteColumn(JTable tabla, int[] indices){
+    public static /*CustomTableModel*/void deleteColumn(JTable tabla, int[] indices){
         CustomTableModel dtm = (CustomTableModel) tabla.getModel();
         int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
         Vector tableData = new Vector();
         Vector d = null;
         Vector names = new Vector();
         
-        for (int i = 0 ; i< nCol ; i++)
+        for (int i = 0 ; i < nCol ; i++)
                 names.add(tabla.getColumnName(i));
         
-        for (int i = indices.length-1; i >=0 ; i--)
-            names.remove(i);
+        for (int i = indices.length-1; i >= 0 ; i--)
+            names.remove(indices[i]);
+        
+//        System.out.println("indices: "+indices.length);
+//        System.out.println("Names: "+names);
         
         for (int i = 0 ; i < nRow ; i++){
             d = new Vector();
@@ -130,10 +134,11 @@ public class ViewController {
         
         for(int index = 0; index < tabla.getModel().getRowCount(); index++)
             for (int i = indices.length - 1; i >= 0; i--)
-                ((Vector)tableData.get(index)).remove(i);
+                ((Vector)tableData.get(index)).remove(indices[i]);
         
- 
-        return new CustomTableModel(tableData, names);
+
+        dtm.setDataVector(tableData, names);
+        //return dtm;
     }
 
     /**
@@ -152,7 +157,9 @@ public class ViewController {
         for (int i = 0 ; i < nRow ; i++){
             d = new Vector();
             for (int j = 0 ; j < nCol ; j++)
-                d.add(dtm.getValueAt(i,j));
+                if(dtm.getValueAt(i,j) == null)
+                    d.add("");
+                else  d.add(dtm.getValueAt(i,j));
         tableData.add(d);
         }
         return tableData;

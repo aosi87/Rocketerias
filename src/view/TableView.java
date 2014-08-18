@@ -11,8 +11,6 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -255,30 +253,29 @@ public class TableView extends javax.swing.JFrame {
         // TODO add your handling code here:
         JFileChooser fileChooser = new JFileChooser();
         //Agregamos un filtro de extensiones
-        //this.showDetailsView(fileChooser.getComponents());
-        //Agregamos un filtro de extensiones
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("MS-Word", "docx","doc"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Adobe-PDF", "pdf"));
         fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        int returnValue = fileChooser.showDialog(null,"Seleccionar");
+        
+        int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
+        if(fileChooser.getSelectedFile() != null)
+        if(!ViewController.isExcel(fileChooser.getSelectedFile().getName())){
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
-                //this.setTableModel(new ViewController(fileChooser.getSelectedFile()).fillTableVector());
+                //File selectedFile = fileChooser.getSelectedFile();
+                //System.out.println(fileChooser.getSelectedFile().getName());
                 ViewController vc = null;
                 try {
                     vc = new ViewController(fileChooser.getSelectedFile());
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this,
-                                            "No fue posible obtener el archivo."
-                                          + "\nVerifique que el archivo no este siendo usado por\n"
-                                          + "otra persona/programa, este en vista protegida y/ó\n"
-                                          + "cambiado de directorio/nombre.",
+                                            "Ocurrio un error al obtener el Archivo.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
                     break;
-                    //this.jMenuOpenActionPerformed(evt);
-                    //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+                    //this.jButtonCargarActionPerformed(evt);
+                    //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (OutOfMemoryError oome) {
                     JOptionPane.showMessageDialog(this,
                                             "El archivo es demasiado greande para leerlo"
@@ -288,10 +285,14 @@ public class TableView extends javax.swing.JFrame {
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
                     break;
-                } 
+                }
+                TableView tv = new TableView(fileChooser.getSelectedFile().getName());
                 Object[] opc;
-                String s = vc.getNameSheet(0);
-                if(vc.getNameSheet(0)!=null){
+                String s = null;
+                
+                //System.err.println("num: " + vc.getNumSheet());
+                 s = vc.getNameSheet(0);
+                if(s != null){
                 int index = 0;
                 if( vc.getNumSheet() > 1){
                     opc = new Object[vc.getNumSheet()];
@@ -302,13 +303,16 @@ public class TableView extends javax.swing.JFrame {
                                             "Se encontraron varias Hojas.",
                                             JOptionPane.QUESTION_MESSAGE,
                                             null,opc,null);
-                    //System.out.println(s);
+                    if(s == null)
+                        break;//s = vc.getNameSheet(0);
                     for(int i = 0; i < vc.getNumSheet(); i++)
                         if(s.equalsIgnoreCase(opc[i].toString()))
                             index = i;
                 }
-                this.setSheetName(s);
-                this.setTableModel(vc.fillTableVector(index));
+                tv.setSheetName(s);
+                tv.setTableModel(vc.fillTableVector(index));
+                tv.setVisible(true);
+                this.dispose(); 
                 }
                 break;
             case JFileChooser.CANCEL_OPTION:
@@ -316,7 +320,10 @@ public class TableView extends javax.swing.JFrame {
                 break;
             case JFileChooser.ERROR_OPTION:
                 JOptionPane.showMessageDialog(this,
-                                            "No fue posible obtener el archivo,",
+                                            "No fue posible obtener el archivo."
+                                          + "\nVerifique que el archivo no este siendo usado por\n"
+                                          + "otra persona/programa, este en vista protegida y/ó\n"
+                                          + "cambiado de directorio/nombre.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
                 //System.err.println("ErrorDesconocido");
@@ -324,6 +331,15 @@ public class TableView extends javax.swing.JFrame {
             default:
                 //System.err.println("Ocurrio un problema"+fileChooser.toString());
                 break;
+         } } else {
+            PDFViewer pdf = new PDFViewer(true);
+            try {
+                pdf.openFile(fileChooser.getSelectedFile());
+            } catch (IOException ex) {
+                //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            pdf.setVisible(true);
+            this.dispose();
         }
     }//GEN-LAST:event_jMenuOpenActionPerformed
 

@@ -6,6 +6,7 @@
 
 package model;
 
+import controller.ViewController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,15 +15,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
@@ -35,7 +33,6 @@ import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -102,8 +99,7 @@ public class ExcelWordModel {
               }
     }*/
     
-    public ExcelWordModel(File file){
-            try {
+    public ExcelWordModel(File file) throws IOException{
             String fileToReadname = file.getName();
             String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
                     + 1, fileToReadname.length());
@@ -122,8 +118,8 @@ public class ExcelWordModel {
                 try {
                     pkg = OPCPackage.open(file);
                 } catch (InvalidFormatException ex) {
-                    System.err.println("FormatoDesconocido");
-                    Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
+                    //System.err.println("FormatoDesconocido");
+                    //Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 this.xlsxWorkbook = new XSSFWorkbook(pkg);//new XSSFWorkbook(Excel2007FileToRead);
                 this.isXSLX = true;
@@ -133,9 +129,6 @@ public class ExcelWordModel {
                   System.out.println("Docx");
               } else if (doc.equalsIgnoreCase(extension)){
                   System.out.println("Doc");
-              }
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
               }
     }
     
@@ -254,7 +247,7 @@ public class ExcelWordModel {
         sheetXLSX = this.xlsxWorkbook.getSheetAt(num);
         XSSFRow row;
         int rows = 0;
-        System.err.println(sheetXLSX.getPhysicalNumberOfRows());
+        //System.err.println(sheetXLSX.getPhysicalNumberOfRows());
          for ( int i = 0; i < sheetXLSX.getPhysicalNumberOfRows(); i ++ ){
           d = new Vector();
           row = sheetXLSX.getRow( i );
@@ -304,16 +297,19 @@ public class ExcelWordModel {
         Vector d = null;
         HSSFSheet sheetXLS= null;
         sheetXLS = this.xlsWorkbook.getSheetAt(num);
-        HSSFRow row;
-        int rows = 0;
-        System.err.println(sheetXLS.getPhysicalNumberOfRows());
-         for ( int i = 0; i < sheetXLS.getPhysicalNumberOfRows(); i ++ ){
+        HSSFRow row = null;
+        int rows = Math.max(sheetXLS.getPhysicalNumberOfRows(), sheetXLS.getLastRowNum());
+        //System.err.println(sheetXLS.getPhysicalNumberOfRows());
+         for ( int i = 0; i < rows; i ++ ){
           d = new Vector();
           row = sheetXLS.getRow( i );
+          //int index = Math.min(row.getLastCellNum(), 1);
+          if(row != null)
           //if(rows < row.getPhysicalNumberOfCells())
-          // rows = row.getPhysicalNumberOfCells();
-          for ( int j = 0; j < row.getPhysicalNumberOfCells(); j++ ){
-              HSSFCell cell = row.getCell( j );
+           //rows = row.getPhysicalNumberOfCells();
+          //System.out.println("Cells: "+row.getPhysicalNumberOfCells() +" "+row.getLastCellNum());
+          for ( int j = 0; j < row.getLastCellNum(); j++ ){
+              HSSFCell cell = row.getCell(j,Row.RETURN_BLANK_AS_NULL);
               if ( cell == null)
                   d.add("");
               if ( cell != null)
@@ -351,14 +347,14 @@ public class ExcelWordModel {
          return data;
 }
     
-    public void saveExcel(Vector tableData) throws IOException{
-        //System.out.println(ViewsController.pathExcelSalida);
+    public void saveExcel(Vector tableData) throws IOException, FileNotFoundException, InvalidFormatException{
+        String path = ViewController.pathExcelSalidaDefault+"/Rocketerias.xlsx";
         //Vector h = new Vector();
         //Vector f = new Vector();
         //Vector salida;
         //File fis = new File(ViewsController.pathExcelSalida);
         //this.xlsxWorkbook = new XSSFWorkbook(new FileInputStream(fis));
-        this.fillWorkBook();
+        this.fillWorkBook(tableData,path);
         //this.createDataSalida();
         //this.copyHeaderFormat();
         //Vector dataExcel = this.createDataVectorXLSX(0);
@@ -375,14 +371,26 @@ public class ExcelWordModel {
         //this.readExcel();
     }
     
-    private void fillWorkBook(){
-        try {
+    private void fillWorkBook(Vector tableData, String path) throws FileNotFoundException, IOException, InvalidFormatException{
             //this.xlsxWorkbook.setSheetName(0, "Proshop");
            SXSSFWorkbook wb = new SXSSFWorkbook(500);
             
            this.createHeader(wb);
-           for(int i = 0; i < 10; i++)
-               wb.getSheetAt(0).createRow(i+6);
+           if(this.checkFile(path)){
+                File f = new File(path); 
+                OPCPackage pkg = pkg = OPCPackage.open(f);
+                this.xlsxWorkbook = new XSSFWorkbook(pkg);
+                Vector oldData = this.createDataVectorXLSX(0);
+                for(int i = 5; i >= 0; i--)
+                    oldData.removeElementAt(i);
+                for(int i = 0; i < 7; i++)
+                    oldData.removeElementAt(oldData.size()-1);
+                this.fillWithTableData(wb, oldData);
+                pkg.close();
+                //System.out.println(path);
+           
+           }
+           this.fillWithTableData(wb, tableData);
            this.createFooter(wb);
            this.setColumnWidth(wb.getSheetAt(0));
            this.setCombinedCells(wb.getSheetAt(0));
@@ -390,11 +398,33 @@ public class ExcelWordModel {
                                             //col, fil
            wb.getSheetAt(0).createFreezePane(0, 6);
            this.addImage(wb);
-           this.createDataSalida(wb);
+           this.createDataSalida(wb, path);
            
-        } catch (IOException ex) {
-            Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    
+    private void fillWithTableData(SXSSFWorkbook wb, Vector tableData){
+        Sheet sheet = wb.getSheetAt(0);
+        Row row = null;
+        Cell c = null;
+        int index = sheet.getLastRowNum()+1;
+        for(int i = 0 ; i < tableData.size(); i++){
+            row = sheet.createRow(index+i);
+            for(int j = 0; j < ((Vector)tableData.get(i)).size() ; j++ ){
+                c = row.createCell(j);
+                if(this.isString(((Vector)tableData.get(i)).get(j).toString()))
+                    c.setCellValue(((Vector)tableData.get(i)).get(j).toString());
+                else c.setCellValue(Double.parseDouble(((Vector)tableData.get(i)).get(j).toString()));
+            }    
         }
+    }
+    
+    private boolean isString(String str){
+        try {
+            Double.parseDouble(str);
+            return false;
+        } catch (NumberFormatException e) {
+            return true;
+        }   
     }
     
     private void setColor(CellStyle cs, IndexedColors color){
@@ -439,16 +469,16 @@ public class ExcelWordModel {
         }
 
         
-        FileOutputStream out = new FileOutputStream("C:\\Users\\Elpapo\\Desktop\\Demo.xlsx");
+        FileOutputStream out = new FileOutputStream("");
         wb.write(out);
         out.close();
 
         // dispose of temporary files backing this workbook on disk
         wb.dispose();
-        System.out.println("Success");
+        //System.out.println("Success");
     }
     
-    public void createDataSalida(SXSSFWorkbook xlsxWB) throws FileNotFoundException, IOException{
+    public void createDataSalida(SXSSFWorkbook xlsxWB, String path) throws FileNotFoundException, IOException{
 //        SXSSFWorkbook wb = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
 //        Sheet sh = wb.createSheet();
 //        wb.setSheetName(0, xlsxWB.getSheetName(0));
@@ -478,13 +508,13 @@ public class ExcelWordModel {
 //        }
 
         
-        FileOutputStream out = new FileOutputStream("C:\\Users\\Elpapo\\Desktop\\Demo.xlsx");
+        FileOutputStream out = new FileOutputStream(path);//"C:\\Users\\Elpapo\\Desktop\\Demo.xlsx");
         xlsxWB.write(out);
         out.close();
 
         // dispose of temporary files backing this workbook on disk
         xlsxWB.dispose();
-        System.out.println("Success");
+        //System.out.println("Success");
     }
     
     private Vector mergeVectoresInicial(Vector tabla, Vector headers, Vector footer){
@@ -509,20 +539,13 @@ public class ExcelWordModel {
     
     private void cleanVector(Vector v1){
         int flag = ((Vector)v1.get(0)).size();
-        int count = 1;
         for(int i = 0; i < v1.size(); i++){
             for(int j = 0; j < flag; j++)
                 if(((Vector)v1.get(i)).get(j).toString().equalsIgnoreCase("") || ((Vector)v1.get(i)).get(j).toString().equalsIgnoreCase(" ") || ((Vector)v1.get(i)).get(j).toString().isEmpty() ){
-                    count++;
-                    if( count == flag){
-                       v1.removeElementAt(i);
-                       System.out.println("Contador: "+i);
-                       count=1;
-                       
-                     } 
+                    v1.removeElementAt(i);                       
+                 } 
                     
-               }   
-        }                
+            }                   
     }
 
     /**
@@ -693,6 +716,8 @@ public class ExcelWordModel {
         //    ou = new ExcelWordModel(new File(ViewsController.pathExcelSalida));
             ou.saveExcel(null);
         } catch (IOException ex) {
+            //Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidFormatException ex) {
             //Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -898,7 +923,7 @@ public class ExcelWordModel {
     private void addImage(SXSSFWorkbook wb) throws IOException{
          Sheet sheet = wb.getSheetAt(0);
          //FileInputStream obtains input bytes from the image file
-         FileInputStream inputStream = new FileInputStream("resources/gfx/logo.png");
+         FileInputStream inputStream = new FileInputStream("resources/gfx/logoExcel.png");
          //Get the contents of an InputStream as a byte[].
          byte[] bytes = IOUtils.toByteArray(inputStream);
          //Adds a picture to the workbook
@@ -916,11 +941,17 @@ public class ExcelWordModel {
          ClientAnchor anchor = helper.createClientAnchor();
          //set top-left corner for the image
          anchor.setCol1(0);
-         anchor.setRow1(0);
+         anchor.setRow1(1);
  
          //Creates a picture
          Picture pict = drawing.createPicture(anchor, pictureIdx);
          //Reset the image to the original size
-         pict.resize(.5);
+         pict.resize();
+    }
+
+    private boolean checkFile(String path) {
+        if(new File(path).exists())
+            return true;
+        else return false;
     }
 }
