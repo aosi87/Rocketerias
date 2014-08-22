@@ -204,7 +204,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSeleccionColumn">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;center&gt;Ordenar &lt;br&gt;Columnas&lt;br&gt;&lt;/center&gt;&lt;/html&gt;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;center&gt;Escoger&lt;br&gt;Columnas&lt;/center&gt;&lt;/html&gt;"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSeleccionColumnActionPerformed"/>

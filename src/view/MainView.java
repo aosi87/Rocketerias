@@ -6,13 +6,17 @@
 
 package view;
 
-import com.alee.laf.WebLookAndFeel;
+//import com.alee.laf.WebLookAndFeel;
+import controller.Tabula;
 import controller.ViewController;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -139,8 +143,27 @@ public class MainView extends javax.swing.JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
-        if(fileChooser.getSelectedFile() != null)
-        if(!ViewController.isExcel(fileChooser.getSelectedFile().getName())){
+        if(fileChooser.getSelectedFile() != null){
+            ViewController.setPDFCSVExcel(fileChooser.getSelectedFile().getName());
+        
+        if(ViewController.isPDF){
+            ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
+            this.dispose();
+        }
+        
+        if(ViewController.isCSV){
+            TableView tv = new TableView(fileChooser.getSelectedFile().getAbsolutePath());
+            tv.setSheetName(fileChooser.getSelectedFile().getName());
+                try {
+                    tv.setTableModel(ViewController.populateTableCSV(fileChooser.getSelectedFile().getAbsolutePath()));
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+             tv.setVisible(true);
+             this.dispose();
+        }
+            
+        if(ViewController.isExcel){
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
@@ -211,15 +234,8 @@ public class MainView extends javax.swing.JFrame {
             default:
                 //System.err.println("Ocurrio un problema"+fileChooser.toString());
                 break;
-         } } else {
-            PDFViewer pdf = new PDFViewer(true);
-            try {
-                pdf.openFile(fileChooser.getSelectedFile());
-            } catch (IOException ex) {
-                //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+             } 
             }
-            pdf.setVisible(true);
-            this.dispose();
         }
     }//GEN-LAST:event_jButtonCargarActionPerformed
 
@@ -252,8 +268,8 @@ public class MainView extends javax.swing.JFrame {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    //javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     break;
                 }
             }
@@ -266,10 +282,11 @@ public class MainView extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             //java.util.logging.Logger.getLogger(MainView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>*/
+        //</editor-fold>
+        
         
         // Set WebLAF look and feel 
-         WebLookAndFeel.install();
+         //WebLookAndFeel.install();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override

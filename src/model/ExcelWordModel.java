@@ -115,13 +115,16 @@ public class ExcelWordModel {
                 //readXLSFile(Excel2003FileToRead);
               } else if (excel2007.equalsIgnoreCase(extension)) {
                 OPCPackage pkg = null;
+                FileInputStream Excel2007FileToRead = null;
                 try {
+                    Excel2007FileToRead = new FileInputStream(file);
                     pkg = OPCPackage.open(file);
                 } catch (InvalidFormatException ex) {
                     //System.err.println("FormatoDesconocido");
                     //Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                this.xlsxWorkbook = new XSSFWorkbook(pkg);//new XSSFWorkbook(Excel2007FileToRead);
+                //this.xlsxWorkbook = new XSSFWorkbook(pkg);
+                this.xlsxWorkbook = new XSSFWorkbook(Excel2007FileToRead);
                 this.isXSLX = true;
                 this.numSheetTabs = this.xlsxWorkbook.getNumberOfSheets();
                 //readXLSXFile(Excel2007FileToRead);

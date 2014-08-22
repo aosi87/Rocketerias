@@ -8,6 +8,7 @@ package view;
 
 import controller.ViewController;
 import java.awt.Toolkit;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Vector;
@@ -27,6 +28,7 @@ public class TableView extends javax.swing.JFrame {
     
     private boolean bot1;
     private String path;
+    private int colIndex[] = new int[15];
     /**
      * Creates new form TableView
      */
@@ -164,7 +166,7 @@ public class TableView extends javax.swing.JFrame {
         });
         jPanelManejoDatos.add(jButton1);
 
-        jButtonSeleccionColumn.setText("<html><center>Ordenar <br>Columnas<br></center></html>");
+        jButtonSeleccionColumn.setText("<html><center>Escoger<br>Columnas</center></html>");
         jButtonSeleccionColumn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSeleccionColumnActionPerformed(evt);
@@ -259,8 +261,27 @@ public class TableView extends javax.swing.JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
-        if(fileChooser.getSelectedFile() != null)
-        if(!ViewController.isExcel(fileChooser.getSelectedFile().getName())){
+        if(fileChooser.getSelectedFile() != null){
+            ViewController.setPDFCSVExcel(fileChooser.getSelectedFile().getName());
+        
+        if(ViewController.isPDF){
+            ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
+            this.dispose();
+        }
+        
+        if(ViewController.isCSV){
+            TableView tv = new TableView(fileChooser.getSelectedFile().getAbsolutePath());
+            tv.setSheetName(fileChooser.getSelectedFile().getName());
+                try {
+                    tv.setTableModel(ViewController.populateTableCSV(fileChooser.getSelectedFile().getAbsolutePath()));
+                } catch (FileNotFoundException ex) {
+                    //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+             tv.setVisible(true);
+             this.dispose();
+        }
+            
+        if(ViewController.isExcel){
         switch(returnValue){
             case JFileChooser.APPROVE_OPTION:
                 //File selectedFile = fileChooser.getSelectedFile();
@@ -331,15 +352,8 @@ public class TableView extends javax.swing.JFrame {
             default:
                 //System.err.println("Ocurrio un problema"+fileChooser.toString());
                 break;
-         } } else {
-            PDFViewer pdf = new PDFViewer(true);
-            try {
-                pdf.openFile(fileChooser.getSelectedFile());
-            } catch (IOException ex) {
-                //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+             } 
             }
-            pdf.setVisible(true);
-            this.dispose();
         }
     }//GEN-LAST:event_jMenuOpenActionPerformed
 
@@ -427,7 +441,11 @@ public class TableView extends javax.swing.JFrame {
 
     private void jButtonSeleccionColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSeleccionColumnActionPerformed
         // TODO add your handling code here:
-        Object[] possibilities = {"ham", "spam", "yam"};
+        
+        CheckColumns cc = new CheckColumns();
+        cc.setVisible(true);
+        colIndex = cc.getIndexes();
+        /*Object[] possibilities = {"ham", "spam", "yam"};
         String s = (String)JOptionPane.showInputDialog(
                     this,
                     "Seleccione la Hoja de Calculo:\n",
@@ -436,6 +454,7 @@ public class TableView extends javax.swing.JFrame {
                     null,
                     possibilities,
                     null);
+         */
         //System.out.println(s);
     }//GEN-LAST:event_jButtonSeleccionColumnActionPerformed
 
