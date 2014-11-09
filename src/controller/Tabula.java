@@ -53,7 +53,7 @@ public class Tabula {
     private static String BANNER = "\nTabula helps you extract tables from PDFs\n\n";
     private static List<Table> table = null;
 
-    public Tabula(String[] args) {
+    public Tabula(String[] args) throws ParseException{
         CommandLineParser parser = new GnuParser();
         try {
             // parse the command line arguments
@@ -105,7 +105,7 @@ public class Tabula {
         
         Appendable outFile = System.out;
         if (line.hasOption('o')) {
-            File file = new File(ViewController.pathExcelSalidaDefault,line.getOptionValue('o'));
+            File file = new File(ViewController.pathExcelSalidaDefault,line.getOptionValue('o').trim());
             
             try {               
                 file.createNewFile();
@@ -185,7 +185,7 @@ public class Tabula {
             tables.clear();
 
         } catch (IOException e) {
-            //throw new ParseException(e.getMessage());
+            throw new ParseException(e.getMessage());
         }
 
     }
@@ -357,8 +357,9 @@ public class Tabula {
     }
     
     public static void main(String... args){
+        try{
         Tabula t = new Tabula(new String[]{"C:/Users/Manuu Alcocer/Downloads/00Archivos Muestras/Avenview Master Cust Price List Q4 2012_REV_2.pdf","-n","-p all"
                 ,"-o demo.csv"});
-    
+        } catch (ParseException pe){}
     }
 }

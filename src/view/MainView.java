@@ -23,6 +23,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.commons.cli.ParseException;
 
 /**
  *
@@ -48,7 +49,8 @@ public class MainView extends javax.swing.JFrame {
     private BufferedImage loadImageIntoJLABEL() throws IOException{
             BufferedImage bi=new BufferedImage(jLabelLogo.getWidth(),jLabelLogo.getHeight(),BufferedImage.TYPE_INT_ARGB);
             Graphics2D g=bi.createGraphics();
-            Image img = ImageIO.read(new File("resources/gfx/logoMining.png"));
+            
+            Image img = ImageIO.read(getClass().getClassLoader().getResource("gfx/logoMining.png"));//new File("resources/gfx/logoMining.png"));
             g.drawImage(img, 0, 0, jLabelLogo.getWidth(), jLabelLogo.getHeight(), null);
             g.dispose();
             return bi;
@@ -72,9 +74,7 @@ public class MainView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Cargar lista de productos.");
-        setIconImage(new ImageIcon("resources/gfx/icon.png").getImage());
-        setMaximumSize(new java.awt.Dimension(400, 300));
-        setPreferredSize(new java.awt.Dimension(300, 200));
+        setIconImage(new ImageIcon(getClass().getClassLoader().getResource("gfx/icon.png")).getImage());
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -147,19 +147,28 @@ public class MainView extends javax.swing.JFrame {
             ViewController.setPDFCSVExcel(fileChooser.getSelectedFile().getName());
         
         if(ViewController.isPDF){
-            ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
-            this.dispose();
+                try {
+                    ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
+                    new TableView();
+                    this.dispose();
+                } catch (ParseException ex) {
+                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
         
         if(ViewController.isCSV){
             TableView tv = new TableView(fileChooser.getSelectedFile().getAbsolutePath());
             tv.setSheetName(fileChooser.getSelectedFile().getName());
                 try {
-                    tv.setTableModel(ViewController.populateTableCSV(fileChooser.getSelectedFile().getAbsolutePath()));
+                    tv.setTableModel(ViewController.fillTableCSV(ViewController.insertDataCSV(fileChooser.getSelectedFile().getAbsolutePath())));
+                    
                 } catch (FileNotFoundException ex) {
-                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                    //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                 }
              tv.setVisible(true);
+             tv.repaint();
              this.dispose();
         }
             

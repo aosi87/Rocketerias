@@ -7,18 +7,25 @@
 package view;
 
 import controller.ViewController;
+import java.awt.Dialog;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import model.CustomTableModel;
+import org.apache.commons.cli.ParseException;
 
 /**
  *
@@ -28,7 +35,7 @@ public class TableView extends javax.swing.JFrame {
     
     private boolean bot1;
     private String path;
-    private int colIndex[] = new int[15];
+    private int colIndex[];
     /**
      * Creates new form TableView
      */
@@ -59,6 +66,10 @@ public class TableView extends javax.swing.JFrame {
                                                             "Manejo de Tabla",
                                                             TitledBorder.CENTER,
                                                             TitledBorder.TOP)); 
+    }
+    
+    void setIndexes(int[] indexes){
+        this.colIndex = indexes;
     }
     
     
@@ -109,7 +120,7 @@ public class TableView extends javax.swing.JFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Software Mineria");
+        setTitle("Software Mineria de Datos.");
         setMaximumSize(new java.awt.Dimension(1080, 720));
         setMinimumSize(new java.awt.Dimension(800, 600));
         setName("TableView"); // NOI18N
@@ -265,8 +276,12 @@ public class TableView extends javax.swing.JFrame {
             ViewController.setPDFCSVExcel(fileChooser.getSelectedFile().getName());
         
         if(ViewController.isPDF){
-            ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
-            this.dispose();
+                try {
+                    ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
+                    this.dispose();
+                } catch (ParseException ex) {
+                    Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
         
         if(ViewController.isCSV){
@@ -423,12 +438,17 @@ public class TableView extends javax.swing.JFrame {
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         try {
             // TODO add your handling code here:
-            ViewController.saveData(0,this.jTable1);
-            JOptionPane.showMessageDialog(this,
+            if(this.colIndex.length > 1){
+             ViewController.saveData(this.colIndex,this.jTable1);
+             JOptionPane.showMessageDialog(this,
                 "Datos guardados satisfactoriamente",
                 "Guardado completo",
                 JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception ex) {
+            } else JOptionPane.showMessageDialog(this,
+                "No se han seleccionado los indices de las columnas.",
+                "Error en la Seleccion de Columnas.",
+                JOptionPane.ERROR_MESSAGE);
+        } catch (NullPointerException ex) {
             JOptionPane.showMessageDialog(this,
                                             "No fue posible guardar el archivo.\n"
                                           + "Verifique si el archivo no este siendo\n"
@@ -436,15 +456,50 @@ public class TableView extends javax.swing.JFrame {
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
             //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButtonSeleccionColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSeleccionColumnActionPerformed
         // TODO add your handling code here:
         
-        CheckColumns cc = new CheckColumns();
+        final MarkColumns cc = new MarkColumns(this, true);
+        cc.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+        //cc.setVisible(true);
+        
+        CustomTableModel ctm = new CustomTableModel();
+        Vector header = new Vector();
+        Vector data = new Vector();
+        Vector row;
+        
+        for(int i = 0; i < this.jTable1.getModel().getColumnCount(); i++){
+         header.add(this.jTable1.getModel().getColumnName(i));
+         this.jTable1.getColumnModel().getColumn(i).setMinWidth(100);
+        }
+
+        for(int i = 0; i < 5 ; i++){
+            row = new Vector();
+            for(int j = 0; j < this.jTable1.getModel().getColumnCount(); j++){
+             row.add(this.jTable1.getModel().getValueAt(i, j));          
+             //System.out.println(this.jTable1.getModel().getValueAt(i, j));
+            }
+            data.add(row);
+        }        
+        
+        ctm.setDataVector(data, header);
+        cc.setTableModel(ctm);
         cc.setVisible(true);
-        colIndex = cc.getIndexes();
+        colIndex = cc.getIndexes(); //0 no seleccionado
+        cc.dispose();
+        if(colIndex == null)
+            colIndex = new int[1];
+        /*for(int i = 0; i < colIndex.length; i ++){
+            //System.out.println(((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex());
+            System.out.print(colIndex[i]+"-");
+         }*/
+        
+        
         /*Object[] possibilities = {"ham", "spam", "yam"};
         String s = (String)JOptionPane.showInputDialog(
                     this,

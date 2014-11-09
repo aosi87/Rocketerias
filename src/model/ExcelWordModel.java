@@ -249,17 +249,19 @@ public class ExcelWordModel {
         XSSFSheet sheetXLSX = null;
         sheetXLSX = this.xlsxWorkbook.getSheetAt(num);
         XSSFRow row;
-        int rows = 0;
+        int cells = 0;
         //System.err.println(sheetXLSX.getPhysicalNumberOfRows());
-         for ( int i = 0; i < sheetXLSX.getPhysicalNumberOfRows(); i ++ ){
+         for ( int i = 0; i <= sheetXLSX.getLastRowNum(); i ++ ){
           d = new Vector();
           row = sheetXLSX.getRow( i );
-          if(rows < row.getPhysicalNumberOfCells())
-           rows = row.getPhysicalNumberOfCells();
-          for ( int j = 0; j < row.getPhysicalNumberOfCells(); j++ ){
-              XSSFCell cell = row.getCell( j );
-              if ( cell == null)
-                  d.add("");
+          if(row != null){
+              
+          if(cells < row.getLastCellNum())
+           cells = row.getLastCellNum();
+          for ( int j = 0; j < cells; j++ ){
+              XSSFCell cell = row.getCell(j, Row.CREATE_NULL_AS_BLANK);
+              //if ( cell == null)
+                //  d.add("");
               if ( cell != null)
               switch(cell.getCellType()){
                     case XSSFCell.CELL_TYPE_BLANK:
@@ -288,9 +290,9 @@ public class ExcelWordModel {
           }
                     //d.add( "\n" );
                     data.add( d );
-         } 
+         } }
          //printVector(data);
-         this.setNumColumns(rows);
+         this.setNumColumns(cells);
          this.setNumRows(sheetXLSX.getPhysicalNumberOfRows());
          return data;
 }
@@ -694,7 +696,7 @@ public class ExcelWordModel {
         this.isXSLX = isXSLX;
     }
     
-    public void printVector(Vector a){
+    public static void printVector(Vector a){
         try{                     //filas   columnas
         System.out.println(a.size()+" "+((Vector)a.get(1)).size());
         } catch (ArrayIndexOutOfBoundsException e){e.printStackTrace();}
@@ -926,7 +928,7 @@ public class ExcelWordModel {
     private void addImage(SXSSFWorkbook wb) throws IOException{
          Sheet sheet = wb.getSheetAt(0);
          //FileInputStream obtains input bytes from the image file
-         FileInputStream inputStream = new FileInputStream("resources/gfx/logoExcel.png");
+         FileInputStream inputStream = new FileInputStream(getClass().getClassLoader().getResource("gfx/logoExcel.png").getPath());
          //Get the contents of an InputStream as a byte[].
          byte[] bytes = IOUtils.toByteArray(inputStream);
          //Adds a picture to the workbook

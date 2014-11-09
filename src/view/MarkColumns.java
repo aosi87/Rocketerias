@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Isaac Alcocer <aosi87@gmail.com>.
+ * Copyright 2014 Elpapo.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,26 @@
 
 package view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
 /**
  *
- * @author Isaac Alcocer <aosi87@gmail.com>
+ * @author Elpapo
  */
-public class CheckColumns extends javax.swing.JFrame {
-
+public class MarkColumns extends javax.swing.JDialog {
+    
     private final String columns[] = {"-","Modelo","Descripción","No.Parte","Codigo de Barras",
         "Unidad de Medida","Costo","Precio Publico","Precio Contratista",
         "Precio Mayoreo","Precio Super Mayoreo","Stock","Imagen","Giro","Marca"};
     private int indexes[];
     
-    //List<JComboBox> comboBoxes = new ArrayList();
-    //JComboBox comboBox = new JComboBox();
     /**
-     * Creates new form checkColumns
+     * Creates new form MarkColumns
      */
-    public CheckColumns() {
+    public MarkColumns(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(null);
     }
@@ -65,14 +60,13 @@ public class CheckColumns extends javax.swing.JFrame {
         jPanelComboBox = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Seleccionar Columnas.");
-        setMaximumSize(new java.awt.Dimension(400, 300));
-        setMinimumSize(new java.awt.Dimension(400, 300));
+        setTitle("Seleccionar Columnas");
+        setAlwaysOnTop(true);
+        setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
         getContentPane().setLayout(new java.awt.GridLayout(2, 0));
 
         jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Extracto Tabla"));
         jScrollPane2.setAutoscrolls(true);
-        jScrollPane2.setMaximumSize(new java.awt.Dimension(1024, 1024));
         jScrollPane2.setPreferredSize(new java.awt.Dimension(100, 100));
 
         jTable2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -84,7 +78,7 @@ public class CheckColumns extends javax.swing.JFrame {
                 "Title 1"
             }
         ));
-        jTable2.setFillsViewportHeight(true);
+        jTable2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jTable2.setMaximumSize(new java.awt.Dimension(100, 64));
         jTable2.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(jTable2);
@@ -115,7 +109,7 @@ public class CheckColumns extends javax.swing.JFrame {
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelButtonsLayout.createSequentialGroup()
                 .addComponent(jPanelButtonAction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 406, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2))
@@ -135,7 +129,7 @@ public class CheckColumns extends javax.swing.JFrame {
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         jPanelComboBox.setBorder(javax.swing.BorderFactory.createTitledBorder("Organizar Columnas"));
-        jPanelComboBox.setLayout(new java.awt.GridLayout());
+        jPanelComboBox.setLayout(new javax.swing.BoxLayout(jPanelComboBox, javax.swing.BoxLayout.LINE_AXIS));
         jScrollPane1.setViewportView(jPanelComboBox);
 
         javax.swing.GroupLayout jPanelActionLayout = new javax.swing.GroupLayout(jPanelAction);
@@ -151,15 +145,13 @@ public class CheckColumns extends javax.swing.JFrame {
         jPanelActionLayout.setVerticalGroup(
             jPanelActionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelActionLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(14, 14, 14))
         );
 
         getContentPane().add(jPanelAction);
-
-        getAccessibleContext().setAccessibleDescription("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -198,20 +190,27 @@ public class CheckColumns extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CheckColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MarkColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CheckColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MarkColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CheckColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MarkColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CheckColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MarkColumns.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
-        /* Create and display the form */
+        /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CheckColumns().setVisible(true);
+                MarkColumns dialog = new MarkColumns(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
             }
         });
     }
@@ -228,7 +227,7 @@ public class CheckColumns extends javax.swing.JFrame {
     private javax.swing.JTable jTable2;
     // End of variables declaration//GEN-END:variables
 
-    public int[] getIndexes() {
+public int[] getIndexes() {
         return this.indexes;//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
@@ -236,11 +235,12 @@ public class CheckColumns extends javax.swing.JFrame {
         //this.jTable2.setColumnModel(header.getColumnModel());
         this.jTable2.setModel(data);
         for(int i = 0; i < this.jTable2.getModel().getColumnCount(); i++)
-         this.jTable2.getColumnModel().getColumn(i).setMinWidth(64);
+         this.jTable2.getColumnModel().getColumn(i).setMinWidth(130);
         
-        this.jTable2.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        //this.jTable2.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         //this.jTable2.repaint();
         this.setComboBoxes(data.getColumnCount());
+        //this.jTable2.repaint();
     }
     
     public void setComboBoxes(int numComboBoxes){
@@ -251,6 +251,7 @@ public class CheckColumns extends javax.swing.JFrame {
             //this.comboBoxes.add(cBox);
             this.jPanelComboBox.add(cBox);
         }
+        this.repaint();
     }
-    
+
 }

@@ -6,8 +6,10 @@
 
 package controller;
 
+import au.com.bytecode.opencsv.CSVReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,10 +17,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
 import model.CustomTableModel;
 import model.ExcelWordModel;
 import model.PDFModel;
+import org.apache.commons.cli.ParseException;
 import org.nerdpower.tabula.RectangularTextContainer;
 import org.nerdpower.tabula.Table;
 
@@ -28,8 +33,8 @@ import org.nerdpower.tabula.Table;
  */
 public class ViewController {
     
-    public static final String pathExcelTemplate = "resources/templates/plantillasalida.xlsx";
-    public static String outPutFileName = "extractosTablas.csv";
+    //public final String pathExcelTemplate = getClass().getClassLoader().getResource("templates/plantillasalida.xlsx").getPath();
+    public static String outPutFileName = "extractoTablas.csv";
     public static String pathExcelSalidaDefault = System.getProperty("user.home") + System.getProperty("file.separator")+"Desktop";
     public static String pathExcelSalidaUsuario ="";
     public static boolean isCSV = false;
@@ -178,10 +183,29 @@ public class ViewController {
         return tableData;
     }
     
-    public static void saveData(int indexToCompare, JTable tabla) throws Exception{
+    public static void saveData(int[] indexToCompare, JTable tabla) throws Exception{
         Vector data = getDataFromTable(tabla);
+        Vector newData = new Vector();
+        Vector cells;
+        for(int k = 0; k < data.size() ; k++){ //fila
+         Vector row = (Vector) data.get(k);
+         cells = new Vector();
+         for(int i = 0 ; i < 14; i++)
+              cells.add("");
+          //for(int i = 0; i < row.size() ; i ++){//columna
+              for(int j = 0; j < indexToCompare.length ; j++)
+                  if(indexToCompare[j] != 0){
+                     cells.setElementAt(row.get(j), indexToCompare[j]-1);
+                     System.out.println(cells.get(j)+"-"+row.get(j));
+              }
+              newData.add(cells); 
+          }         
+          
+            //indexToCompare[i] = ((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex();
+            //System.out.println(((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex());
+        //data = getDataFromTable(tabla);
         //System.out.println("Salvando datos."+ data);
-        new ExcelWordModel().saveExcel(data);
+        new ExcelWordModel().saveExcel(newData);
         //sortVector(indexToCompare,data);
     }
     
@@ -197,26 +221,34 @@ public class ViewController {
         return null;//(Vector)newData;
     }
     
-    public static void createCSV( String path ){
+    public static void createCSV( String path ) throws ParseException{
         new Tabula(new String[]{path,"-n", "-p all", "-o " + ViewController.outPutFileName});
     }
     
-    public static CustomTableModel fillVectorCSV( String path ){
-        
-        Tabula tb = new Tabula(new String[]{path,"-n", "-p all", "-o " + ViewController.outPutFileName});
-        List<Table> tables = tb.getTable();
+    public static CustomTableModel fillVectorCSV( String path ) {
+        Tabula tb = null;
         Vector<Vector> data = new Vector();
+        Vector<String> row = null;
+        System.out.println("si");
+        try{
+            System.out.println("tambien");
+            tb = new Tabula(new String[]{path,"-n", "-p all", "-o " + ViewController.outPutFileName});
+        } catch ( Exception e){
+            System.out.println("YES");
+        List<Table> tables = tb.getTable();
         
         for(Table table : tables)
-         for (List<RectangularTextContainer> row: table.getRows()) {
-            Vector<String> rows = new Vector();
-            for (RectangularTextContainer tc: row) {
-                rows.add(tc.getText());    
+         for (List<RectangularTextContainer> rows: table.getRows()) {
+            row = new Vector();
+            for (RectangularTextContainer tc: rows) {
+                row.add(tc.getText());    
             }
-            data.add(rows);
+            System.out.println(row);
+            data.add(row);
          }
-            
-        return new CustomTableModel(data, null);
+        }
+        ExcelWordModel.printVector(data);
+        return new CustomTableModel(data, new Vector());
     }
     
     public static boolean isString(String str){
@@ -259,7 +291,7 @@ public class ViewController {
       model.setRowCount(data.size());
       model.setColumnCount(col);//((Vector)data.get(0)).size());
       //model.setDataVector(data, new Vector());
-      System.out.println(model.getRowCount()+" -- "+ model.getColumnCount() +": col = "+ col);
+      //System.out.println(model.getRowCount()+" -- "+ model.getColumnCount() +": col = "+ col);
       for (int i = 0 ; i < model.getRowCount() ; i++){
           for(int j = 0 ; j < model.getColumnCount();  j++){
              if(col > ((Vector)data.get(i)).size())
@@ -273,23 +305,53 @@ public class ViewController {
       return model;
 } 
     
-    public static CustomTableModel insertDataCSV(String source) throws FileNotFoundException {
-        CustomTableModel model = new CustomTableModel();
-        Scanner scan = new Scanner(new File(source));
-        String[] array;
-        while (scan.hasNextLine()) {
-            String line = scan.nextLine();
-            if(line.contains(","))
-                array = line.split(",");
-            else
-                array = line.split("\t");
-          Object[] data = new Object[array.length];
-            System.arraycopy(array, 0, data, 0, array.length);
-        model.setColumnIdentifiers(new Vector());
-        model.addRow(data);
-    }
-    return model;
+    public static Vector insertDataCSV(String source) throws FileNotFoundException, IOException {
+        //CustomTableModel model = new CustomTableModel();
+        CSVReader reader = new CSVReader(new FileReader(source));
+        String [] Line;
+        int col = 0;
+        int filas = 0;
+        Vector<Vector> data = new Vector();
+        Vector<String> d = null;
+        while ((Line = reader.readNext()) != null) {
+             d = new Vector();
+            // nextLine[] is an array of values from the line
+            for(int i = 0; i < Line.length; i++){
+                 d.add(Line[i]);
+            }
+            if(Line.length > col)
+                col = Line.length;
+            data.add(d);
+        }
+        //model.setColumnCount(col);
+        //model.setRowCount(data.size());
+        //System.out.println(model.getRowCount()+"-"+model.getColumnCount());
+//        for(int i = 0; i < data.size() ; i++)
+//            for(int j = 0; j< col; j++){
+//                model.setValueAt(((Vector<String>)data.get(i)).get(j), i, j);
+//                System.out.println("--"+model.getValueAt(i, j));//((Vector)data.get(i)).get(j).toString());
+//            }
+//        model.setDataVector(data, new Vector());
+        
+    return data;//model;
 } 
+    
+    public static CustomTableModel fillTableCSV(Vector a){
+        CustomTableModel dtm = new CustomTableModel();
+        dtm.setColumnCount(4);
+        dtm.setRowCount(a.size());
+        dtm.setDataVector(a, new Vector());
+        return dtm;
+    }
+    
+    public static void main(String[] args){
+        try {
+            //ViewController.fillVectorCSV("C:\\Users\\Elpapo\\Downloads\\N-outline.pdf");
+            ViewController.insertDataCSV("C:\\Users\\Elpapo\\Desktop\\extractoTablas.csv");
+        } catch (IOException ex) {
+            Logger.getLogger(ViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     
     
