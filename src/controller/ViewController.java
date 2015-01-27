@@ -19,6 +19,7 @@ import java.util.Scanner;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import model.CustomTableModel;
 import model.ExcelWordModel;
@@ -34,7 +35,7 @@ import org.nerdpower.tabula.Table;
 public class ViewController {
     
     //public final String pathExcelTemplate = getClass().getClassLoader().getResource("templates/plantillasalida.xlsx").getPath();
-    public static String outPutFileName = "extractoTablas.csv";
+    public static String outPutFileName = "extractoPDF.csv";
     public static String pathExcelSalidaDefault = System.getProperty("user.home") + System.getProperty("file.separator")+"Desktop";
     public static String pathExcelSalidaUsuario ="";
     public static boolean isCSV = false;
@@ -183,7 +184,7 @@ public class ViewController {
         return tableData;
     }
     
-    public static void saveData(int[] indexToCompare, JTable tabla) throws Exception{
+    public static void saveData(int[] indexToCompare, JTable tabla, JComboBox marca, boolean se) throws Exception{
         Vector data = getDataFromTable(tabla);
         Vector newData = new Vector();
         Vector cells;
@@ -191,12 +192,14 @@ public class ViewController {
          Vector row = (Vector) data.get(k);
          cells = new Vector();
          for(int i = 0 ; i < 14; i++)
-              cells.add("");
+             if(i == 13 )
+              cells.add(marca.getSelectedItem().toString());
+             else cells.add("");
           //for(int i = 0; i < row.size() ; i ++){//columna
               for(int j = 0; j < indexToCompare.length ; j++)
                   if(indexToCompare[j] != 0){
                      cells.setElementAt(row.get(j), indexToCompare[j]-1);
-                     System.out.println(cells.get(j)+"-"+row.get(j));
+                     //System.out.println(cells.get(j)+"-"+row.get(j));
               }
               newData.add(cells); 
           }         
@@ -205,7 +208,35 @@ public class ViewController {
             //System.out.println(((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex());
         //data = getDataFromTable(tabla);
         //System.out.println("Salvando datos."+ data);
-        new ExcelWordModel().saveExcel(newData);
+        new ExcelWordModel().saveExcel(newData, marca.getSelectedItem().toString(),marca.getSelectedIndex(),se);
+        //sortVector(indexToCompare,data);
+    }
+    
+    public static void saveData(int[] indexToCompare, JTable tabla, JComboBox marca, String sFileName, String sFilePath) throws Exception{
+        Vector data = getDataFromTable(tabla);
+        Vector newData = new Vector();
+        Vector cells;
+        for(int k = 0; k < data.size() ; k++){ //fila
+         Vector row = (Vector) data.get(k);
+         cells = new Vector();
+         for(int i = 0 ; i < 14; i++)
+             if(i == 13 )
+              cells.add(marca.getSelectedItem().toString());
+             else cells.add("");
+          //for(int i = 0; i < row.size() ; i ++){//columna
+              for(int j = 0; j < indexToCompare.length ; j++)
+                  if(indexToCompare[j] != 0){
+                     cells.setElementAt(row.get(j), indexToCompare[j]-1);
+                     //System.out.println(cells.get(j)+"-"+row.get(j));
+              }
+              newData.add(cells); 
+          }         
+          
+            //indexToCompare[i] = ((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex();
+            //System.out.println(((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex());
+        //data = getDataFromTable(tabla);
+        //System.out.println("Salvando datos."+ data);
+        new ExcelWordModel().saveExcel(newData, marca.getSelectedItem().toString(),marca.getSelectedIndex(), sFileName,sFilePath);
         //sortVector(indexToCompare,data);
     }
     
@@ -222,7 +253,7 @@ public class ViewController {
     }
     
     public static void createCSV( String path ) throws ParseException{
-        new Tabula(new String[]{path,"-n", "-p all", "-o " + ViewController.outPutFileName});
+        new Tabula(new String[]{path,"-r", "-p all", "-o " + ViewController.outPutFileName});
     }
     
     public static CustomTableModel fillVectorCSV( String path ) {

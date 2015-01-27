@@ -168,7 +168,7 @@ public class TabulaController {
             PageIterator pageIterator = pages == null ? oe.extract() : oe.extract(pages);
             Page page;
             List<Table> tables = new ArrayList<Table>();
-
+            System.out.println(")======"+pages.size());
             while (pageIterator.hasNext()) {
                 page = pageIterator.next();
                 
@@ -320,7 +320,7 @@ public class TabulaController {
     public static void main(String[] args) throws ScriptException {
         String datos[] = new String[8];
         datos[0] = "C:/Users/Manuu Alcocer/Downloads/00Archivos Muestras/Avenview Master Cust Price List Q4 2012_REV_2.pdf"; //archivo a analizar
-        datos[1] = ViewController.pathExcelSalidaDefault + "/CSV.csv";//archivo salida
+        datos[1] = ViewController.pathExcelSalidaDefault + "/extractoPDF.csv";//archivo salida
         datos[2] = ""; //Rectangulo "float,float,float,float"
         datos[3] = ""; //coordenadas de columnas "float,float,float"
         datos[4] = ""; //Paginas por defecto es "all", de lo contrario "1" "3" "1-3" "5-7"

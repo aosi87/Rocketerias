@@ -148,7 +148,7 @@ public class Tabula {
             PageIterator pageIterator = pages == null ? oe.extract() : oe.extract(pages);
             Page page;
             List<Table> tables = new ArrayList<Table>();
-
+            System.out.println("======"+tables.size());
             while (pageIterator.hasNext()) {
                 page = pageIterator.next();
                 
@@ -179,10 +179,10 @@ public class Tabula {
                     writeTables(of, tables, outFile);
                 }
                 
-                //tables.clear();
+                tables.clear();
             }
-            Tabula.table = tables;
-            tables.clear();
+            //Tabula.table = tables;
+            //tables.clear();
 
         } catch (IOException e) {
             throw new ParseException(e.getMessage());
@@ -356,10 +356,29 @@ public class Tabula {
         return table;
     }
     
+    public static Page getPage(String path, int pageNumber) throws IOException {
+        ObjectExtractor oe = null;
+        try {
+            PDDocument document = PDDocument
+                    .load(path);
+            oe = new ObjectExtractor(document);
+            Page page = oe.extract(pageNumber);
+            return page;
+        } finally {
+            oe.close();
+        }
+    }
+    
     public static void main(String... args){
         try{
-        Tabula t = new Tabula(new String[]{"C:/Users/Manuu Alcocer/Downloads/00Archivos Muestras/Avenview Master Cust Price List Q4 2012_REV_2.pdf","-n","-p all"
+        Tabula t = new Tabula(new String[]{"C:\\Users\\Elpapo\\Desktop\\Altman Exclusive Dealer Confidential Price List Jan  2014.pdf","-n","-p all"
                 ,"-o demo.csv"});
-        } catch (ParseException pe){}
+        
+        /*Iterator<Table> iter = Tabula.table.iterator();
+        while (iter.hasNext()) {
+            System.err.println(iter.next());//writer.write(out, iter.next());
+        }*/
+        
+        } catch (ParseException pe){System.err.println("damn");}
     }
 }

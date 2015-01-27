@@ -37,7 +37,9 @@ public class MarkColumns extends javax.swing.JDialog {
     public MarkColumns(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        this.setLocationRelativeTo(null);
+        this.jScrollPane2.getHorizontalScrollBar().setModel( 
+                this.jScrollPane1.getHorizontalScrollBar().getModel());
+        this.setLocationRelativeTo(parent);
     }
 
     /**
@@ -62,11 +64,15 @@ public class MarkColumns extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Seleccionar Columnas");
         setAlwaysOnTop(true);
+        setMaximumSize(new java.awt.Dimension(602, 600));
+        setMinimumSize(new java.awt.Dimension(600, 300));
         setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
+        setPreferredSize(new java.awt.Dimension(600, 350));
+        setResizable(false);
         getContentPane().setLayout(new java.awt.GridLayout(2, 0));
 
         jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Extracto Tabla"));
-        jScrollPane2.setAutoscrolls(true);
+        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setPreferredSize(new java.awt.Dimension(100, 100));
 
         jTable2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -129,7 +135,7 @@ public class MarkColumns extends javax.swing.JDialog {
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         jPanelComboBox.setBorder(javax.swing.BorderFactory.createTitledBorder("Organizar Columnas"));
-        jPanelComboBox.setLayout(new javax.swing.BoxLayout(jPanelComboBox, javax.swing.BoxLayout.LINE_AXIS));
+        jPanelComboBox.setLayout(new java.awt.GridBagLayout());
         jScrollPane1.setViewportView(jPanelComboBox);
 
         javax.swing.GroupLayout jPanelActionLayout = new javax.swing.GroupLayout(jPanelAction);
@@ -162,14 +168,20 @@ public class MarkColumns extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here: 
+        boolean flag = false;
         int size = this.jPanelComboBox.getComponentCount();
         indexes = new int[size];
         for(int i = 0; i < size; i ++){
             indexes[i] = ((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex();
+            if(indexes[i] != 0)
+                flag = true;
+                
             //System.out.println(((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex());
             //System.out.print(indexes[i]+"-");
         }
+        if(!flag)
+            indexes = null;
         this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -233,10 +245,7 @@ public int[] getIndexes() {
     
     public void setTableModel(TableModel data){//JTableHeader header, Vector data){
         //this.jTable2.setColumnModel(header.getColumnModel());
-        this.jTable2.setModel(data);
-        for(int i = 0; i < this.jTable2.getModel().getColumnCount(); i++)
-         this.jTable2.getColumnModel().getColumn(i).setMinWidth(130);
-        
+        this.jTable2.setModel(data);        
         //this.jTable2.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         //this.jTable2.repaint();
         this.setComboBoxes(data.getColumnCount());
@@ -251,7 +260,11 @@ public int[] getIndexes() {
             //this.comboBoxes.add(cBox);
             this.jPanelComboBox.add(cBox);
         }
-        this.repaint();
+        this.pack();
+        for(int i = 0; i < jTable2.getColumnCount(); i++)
+         this.jTable2.getColumnModel().getColumn(i).setMinWidth(
+                    jPanelComboBox.getComponent(i).getWidth() );
+        //this.repaint();   
     }
-
+    
 }

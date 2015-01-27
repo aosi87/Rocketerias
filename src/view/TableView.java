@@ -8,19 +8,28 @@ package view;
 
 import controller.ViewController;
 import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -36,18 +45,29 @@ public class TableView extends javax.swing.JFrame {
     private boolean bot1;
     private String path;
     private int colIndex[];
+    private String marcas[] = {"---","Starlighting","Arthea","OTIC Audio/Audio Logic",
+                               "OTIC Led/Video Logic","Stealth Acoustic","Naim","Gefen",
+                               "CurrentAudio","Fenix"};
+
     /**
      * Creates new form TableView
      */
     public TableView() {
         initComponents();
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/gfx/icon.png"));
+        //this.jComboBox1 = new WideComboBox();
+        this.jComboBox1.setModel(new DefaultComboBoxModel(this.marcas));
+        //BoundsPopupMenuListener listener = new BoundsPopupMenuListener(true, false);
+        //jComboBox1.addPopupMenuListener( listener );
+        jComboBox1.setPrototypeDisplayValue("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+
     }
     
     public TableView(String path) {
         initComponents();
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/gfx/icon.png"));
         //this.jTabbedPane1.setTitleAt(0, path);
+        this.jComboBox1.setModel(new DefaultComboBoxModel(this.marcas));
         this.path = path;
         this.setLocationRelativeTo(null);
         this.jPanelManejoTabla.setBorder(null);
@@ -65,7 +85,11 @@ public class TableView extends javax.swing.JFrame {
         this.jPanelManejoTabla.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder (),
                                                             "Manejo de Tabla",
                                                             TitledBorder.CENTER,
-                                                            TitledBorder.TOP)); 
+                                                            TitledBorder.TOP));
+        this.jPanelCombo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder (),
+                                                            "Marcas",
+                                                            TitledBorder.CENTER,
+                                                            TitledBorder.TOP));
     }
     
     void setIndexes(int[] indexes){
@@ -107,21 +131,26 @@ public class TableView extends javax.swing.JFrame {
         jPanelManejoTabla = new javax.swing.JPanel();
         jButtonFilas = new javax.swing.JButton();
         jButtonCabeceras = new javax.swing.JButton();
-        jPanelManejoDatos = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jPanelManejoDatos = new javax.swing.JPanel();
         jButtonSeleccionColumn = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
+        jPanelCombo = new javax.swing.JPanel();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jComboBox1 = new javax.swing.JComboBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuOpen = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Software Mineria de Datos.");
-        setMaximumSize(new java.awt.Dimension(1080, 720));
         setMinimumSize(new java.awt.Dimension(800, 600));
         setName("TableView"); // NOI18N
 
@@ -141,7 +170,6 @@ public class TableView extends javax.swing.JFrame {
             }
         ));
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jTable1.setAutoscrolls(false);
         jTable1.setRowSelectionAllowed(false);
         jScrollPane1.setViewportView(jTable1);
 
@@ -149,7 +177,7 @@ public class TableView extends javax.swing.JFrame {
 
         jPanelManejoTabla.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButtonFilas.setText("<html><center>Selección<br>por Fila</center></html>");
+        jButtonFilas.setText("<html><center>Seleccionando:<br>por Fila</center></html>");
         jButtonFilas.setMaximumSize(new java.awt.Dimension(87, 37));
         jButtonFilas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -158,7 +186,7 @@ public class TableView extends javax.swing.JFrame {
         });
         jPanelManejoTabla.add(jButtonFilas);
 
-        jButtonCabeceras.setText("<html>Seleccionar <br>Cabeceras</html>");
+        jButtonCabeceras.setText("<html><center>Seleccionar <br>Cabeceras</center></html>");
         jButtonCabeceras.setMaximumSize(new java.awt.Dimension(87, 37));
         jButtonCabeceras.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -167,15 +195,15 @@ public class TableView extends javax.swing.JFrame {
         });
         jPanelManejoTabla.add(jButtonCabeceras);
 
-        jPanelManejoDatos.setLayout(new java.awt.GridLayout(1, 0));
-
-        jButton1.setText("<html><center>Borrar<br>Selección</center></html>");
+        jButton1.setText("<html><center>Borrar<br>Seleccinados</center></html>");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanelManejoDatos.add(jButton1);
+        jPanelManejoTabla.add(jButton1);
+
+        jPanelManejoDatos.setLayout(new java.awt.GridLayout(1, 0));
 
         jButtonSeleccionColumn.setText("<html><center>Escoger<br>Columnas</center></html>");
         jButtonSeleccionColumn.addActionListener(new java.awt.event.ActionListener() {
@@ -193,6 +221,16 @@ public class TableView extends javax.swing.JFrame {
         });
         jPanelManejoDatos.add(jButton7);
 
+        jPanelCombo.setLayout(new java.awt.GridLayout(2, 0));
+
+        jCheckBox1.setText("Guardar archivo nuevo");
+        jCheckBox1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jCheckBox1.setBorderPainted(true);
+        jPanelCombo.add(jCheckBox1);
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Marcas", "Item 2", "Item 3", "Item 4" }));
+        jPanelCombo.add(jComboBox1);
+
         jMenu1.setText("Archivo");
 
         jMenuOpen.setText("Abrir");
@@ -203,6 +241,18 @@ public class TableView extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuOpen);
         jMenu1.add(jSeparator1);
+
+        jMenuItem2.setText("Guardar");
+        jMenu1.add(jMenuItem2);
+
+        jMenuItem3.setText("Guardar como...");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem3);
+        jMenu1.add(jSeparator2);
 
         jMenuItemExit.setText("Salir");
         jMenuItemExit.setToolTipText("Al seleccionar esta opcion el programa terminara todo proceso ejecutado por este programa,\nse perdera toda operacion no salvada con aterioridad y el programa finalizara y cerrara todas\nlas instancias del mismo.");
@@ -234,23 +284,23 @@ public class TableView extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 294, Short.MAX_VALUE)
-                        .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelCombo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 481, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -264,7 +314,7 @@ public class TableView extends javax.swing.JFrame {
 
     private void jMenuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuOpenActionPerformed
         // TODO add your handling code here:
-        JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = new JFileChooser();
         //Agregamos un filtro de extensiones
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("MS-Word", "docx","doc"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Adobe-PDF", "pdf"));
@@ -276,12 +326,36 @@ public class TableView extends javax.swing.JFrame {
             ViewController.setPDFCSVExcel(fileChooser.getSelectedFile().getName());
         
         if(ViewController.isPDF){
-                try {
-                    ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
-                    this.dispose();
-                } catch (ParseException ex) {
-                    Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+            SecurityManager secManager = new SecurityManager()
+            {
+                @Override
+                public void checkExit(int status) {
+                    throw new SecurityException();
                 }
+            };
+            SecurityManager oldSecManager = System.getSecurityManager();
+            System.setSecurityManager(secManager);
+                    Thread t = new Thread(new Runnable() {
+                       @Override
+                       public void run() {
+                            try {
+                              ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
+                            } catch (SecurityException e) {
+                                System.err.println("GOTCHA");
+                            } catch (ParseException ex) {
+                               Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+                           }
+                       }
+                    });
+                    t.start();
+                    TableView tv = null;
+                    try {
+                    while(new File("C:\\Users\\Elpapo\\Desktop\\extractoPDF.cvs").canWrite())
+                      tv = new TableView("C:\\Users\\Elpapo\\Desktop\\extractoPDF.cvs");
+                      tv.setTableModel(ViewController.fillVectorCSV("C:\\Users\\Elpapo\\Desktop\\extractoPDF.cvs"));
+                      tv.setVisible(true);
+                      this.dispose();
+                    } catch (AccessControlException ace) { System.setSecurityManager(oldSecManager); System.err.println("oldSecManager");}
         }
         
         if(ViewController.isCSV){
@@ -304,22 +378,27 @@ public class TableView extends javax.swing.JFrame {
                 ViewController vc = null;
                 try {
                     vc = new ViewController(fileChooser.getSelectedFile());
-                } catch (IOException ex) {
+                } catch (IOException ioe) {
                     JOptionPane.showMessageDialog(this,
                                             "Ocurrio un error al obtener el Archivo.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
+                    Toolkit.getDefaultToolkit().beep();
                     break;
                     //this.jButtonCargarActionPerformed(evt);
                     //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (OutOfMemoryError oome) {
                     JOptionPane.showMessageDialog(this,
-                                            "El archivo es demasiado greande para leerlo"
-                                          + "\ncon menos de 2Gigs de memoria utilizable."
-                                          + "\nSe recomienda dividir el archivo en archivos\n"
-                                          + "mas pequeños para su manejo optimo.",
+                                            "El archivo es demasiado greande para leerlo,"
+                                          + "\nno debe contener mas de 50,000 filas y 5000 columnas."
+                                          + "\nSe recomienda abrir el archivo con el programa de origen"
+                                          + "\npara dividirlo en extractos del archivo original.\n"
+                                          + "Es posible que la memoria RAM este siendo utilizada"
+                                          + "\npor programas robustos y no permitan el funcionamiento"
+                                          + "\noptimo para la mineria de datos.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
+                    Toolkit.getDefaultToolkit().beep();
                     break;
                 }
                 TableView tv = new TableView(fileChooser.getSelectedFile().getName());
@@ -389,11 +468,16 @@ public class TableView extends javax.swing.JFrame {
 //                "Favor de seleccionar una fila\n Si la seleccion es multiple,\nse tomara la primera fila seleccionada.",
 //                "No se encontraron filas seleccionadas.",
 //                JOptionPane.ERROR_MESSAGE); break;}
-        } else JOptionPane.showMessageDialog(this,
+            for(int i = 0;  i < this.jTable1.getColumnCount(); i++)
+            this.jTable1.getColumnModel().getColumn(i).setMinWidth(100);
+            this.repaint();
+        } else { JOptionPane.showMessageDialog(this,
                 "Esta opción funciona con la selección de al menos una fila\n"
                         + "\"Seleccion por Fila\" debe estar activado para realizar esta acción.",
                 "No se encontro fila para selección.",
                 JOptionPane.ERROR_MESSAGE);
+                 Toolkit.getDefaultToolkit().beep();
+        }
     }//GEN-LAST:event_jButtonCabecerasActionPerformed
 
     private void jButtonFilasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFilasActionPerformed
@@ -401,13 +485,13 @@ public class TableView extends javax.swing.JFrame {
         if(this.bot1 == true){   
         this.jTable1.setColumnSelectionAllowed(true);
         this.jTable1.setRowSelectionAllowed(false);
-        this.jButtonFilas.setText("<html><center>Selección<br>por Columna</center></html>");
+        this.jButtonFilas.setText("<html><center>Seleccionando:<br>por Columna</center></html>");
         this.setTitle("Software Mineria- Seleccionando por Columna");
         this.bot1 = false;
         } else { 
             this.jTable1.setColumnSelectionAllowed(false);
             this.jTable1.setRowSelectionAllowed(true);
-            this.jButtonFilas.setText("<html><center>Selección<br>por Fila</center></html>");
+            this.jButtonFilas.setText("<html><center>Seleccionando:<br>por Fila</center></html>");
             this.bot1 = true;
         this.setTitle("Software Mineria- Seleccionando por Fila");    
         }
@@ -436,7 +520,7 @@ public class TableView extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        try {
+        /*try {
             // TODO add your handling code here:
             if(this.colIndex.length > 1){
              ViewController.saveData(this.colIndex,this.jTable1);
@@ -448,7 +532,7 @@ public class TableView extends javax.swing.JFrame {
                 "No se han seleccionado los indices de las columnas.",
                 "Error en la Seleccion de Columnas.",
                 JOptionPane.ERROR_MESSAGE);
-        } catch (NullPointerException ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                                             "No fue posible guardar el archivo.\n"
                                           + "Verifique si el archivo no este siendo\n"
@@ -456,11 +540,135 @@ public class TableView extends javax.swing.JFrame {
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
             //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception ex) {
-            Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        if(jComboBox1.getSelectedIndex()!=0)
+        try {   
+        
+        final SaveWindow sw = new SaveWindow(this, true);
+        if(this.colIndex.length > 0 || this.colIndex != null){
+        /*Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                      sw.setVisible(true);
+                    }
+         });
+         t.start();*/
+        
+        SwingWorker worker;
+               worker = new SwingWorker<Void, Void>() {
+                                     
+                   @Override
+                   public Void doInBackground() {
+                        try {
+                            //============> Aqui se guardan los datos
+                            ViewController.saveData(colIndex,jTable1,jComboBox1,jCheckBox1.isSelected());
+                            sw.getPB().setIndeterminate(false);
+                            sw.getPB().setValue(100);
+                            Thread.sleep(300);
+                            
+                            //this.setVisible(false);
+                            //this.dispose();
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(null,
+                                            "No fue posible guardar el archivo.\n"
+                                          + "Verifique si el archivo no este siendo\n"
+                                          + "usado por otra persona u otro programa.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                            Toolkit.getDefaultToolkit().beep();
+                            //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                       return null;
+                   }
+                   
+                   @Override
+                   public void done() {
+                       JOptionPane.showMessageDialog(null,
+                            "Datos guardados satisfactoriamente",
+                            "Guardado completo",
+                            JOptionPane.INFORMATION_MESSAGE);
+                       sw.dispose();
+                       Toolkit.getDefaultToolkit().beep();
+                   }};
+         worker.execute();
+         sw.setVisible(true);
+         
+         if(worker.isDone()){
+           sw.dispose();
+           //System.err.println("DONE");
+         }
+         //sw.saveData(this.colIndex,this.jTable1);
+         
+         //sw.setVisible(false);
+         //sw.dispose();
+        } else { JOptionPane.showMessageDialog(this,
+                "No se han seleccionado los indices de las columnas.",
+                "Error en la Seleccion de Columnas.",
+                JOptionPane.ERROR_MESSAGE);
+                Toolkit.getDefaultToolkit().beep();
+           }
+        
+        } catch (NullPointerException npe) {
+            JOptionPane.showMessageDialog(this,
+                "No se han seleccionado los indices de las columnas.",
+                "Error en la Seleccion de Columnas.",
+                JOptionPane.ERROR_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();
+        } else{ JOptionPane.showMessageDialog(this,
+                "No se ha seleccionado una marca, favor de seleccionar una"
+                        + "\nopcion del menu \"Marcas\"",
+                "Error en la Seleccion de Marcas.",
+                JOptionPane.ERROR_MESSAGE);
+                Toolkit.getDefaultToolkit().beep();
         }
+        this.repaint();
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    public void saveData( int[] colIndex, JTable jTable1 , JComboBox marca, boolean se) {
+        try {
+            // TODO add your handling code here:
+             ViewController.saveData(colIndex,jTable1,marca,se);
+             JOptionPane.showMessageDialog(this,
+                "Datos guardados satisfactoriamente",
+                "Guardado completo",
+                JOptionPane.INFORMATION_MESSAGE);
+             //this.setVisible(false);
+             //this.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                                            "No fue posible guardar el archivo.\n"
+                                          + "Verifique si el archivo no este siendo\n"
+                                          + "usado por otra persona u otro programa.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();
+            //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void saveData( int[] colIndex, JTable jTable1 , JComboBox marca, String sFileName, String sFilePath) {
+        try {
+            // TODO add your handling code here:
+             ViewController.saveData(colIndex,jTable1,marca,sFileName,sFilePath);
+             JOptionPane.showMessageDialog(this,
+                "Datos guardados satisfactoriamente",
+                "Guardado completo",
+                JOptionPane.INFORMATION_MESSAGE);
+             //this.setVisible(false);
+             //this.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                                            "No fue posible guardar el archivo.\n"
+                                          + "Verifique si el archivo no este siendo\n"
+                                          + "usado por otra persona u otro programa.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();
+            //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
     private void jButtonSeleccionColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSeleccionColumnActionPerformed
         // TODO add your handling code here:
         
@@ -477,23 +685,35 @@ public class TableView extends javax.swing.JFrame {
          header.add(this.jTable1.getModel().getColumnName(i));
          this.jTable1.getColumnModel().getColumn(i).setMinWidth(100);
         }
-
-        for(int i = 0; i < 5 ; i++){
+        if(this.jTable1.getModel().getRowCount() > 10)
+        for(int i = 0; i < 6; i++){
             row = new Vector();
             for(int j = 0; j < this.jTable1.getModel().getColumnCount(); j++){
              row.add(this.jTable1.getModel().getValueAt(i, j));          
              //System.out.println(this.jTable1.getModel().getValueAt(i, j));
             }
             data.add(row);
-        }        
+        }
+        
+        else 
+            for(int i = 0; i < this.jTable1.getModel().getRowCount() ; i++){
+            row = new Vector();
+            for(int j = 0; j < this.jTable1.getModel().getColumnCount(); j++){
+             row.add(this.jTable1.getModel().getValueAt(i, j));          
+             //System.out.println(this.jTable1.getModel().getValueAt(i, j));
+            }
+            data.add(row);
+        }
+            
         
         ctm.setDataVector(data, header);
         cc.setTableModel(ctm);
         cc.setVisible(true);
+        cc.repaint();
         colIndex = cc.getIndexes(); //0 no seleccionado
         cc.dispose();
         if(colIndex == null)
-            colIndex = new int[1];
+            colIndex = null;//new int[0];
         /*for(int i = 0; i < colIndex.length; i ++){
             //System.out.println(((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex());
             System.out.print(colIndex[i]+"-");
@@ -516,11 +736,71 @@ public class TableView extends javax.swing.JFrame {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
         JOptionPane.showMessageDialog(this,
-                "NO FUE PENAAAL!!!!!",
-                "NOOOOOOO",
+                "/*\n" +
+" * Copyright 2014 Isaac Alcocer <aosi87@gmail.com>.\n" +
+" *\n" +
+" * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
+" * you may not use this file except in compliance with the License.\n" +
+" * You may obtain a copy of the License at\n" +
+" *\n" +
+" *      http://www.apache.org/licenses/LICENSE-2.0\n" +
+" *\n" +
+" * Unless required by applicable law or agreed to in writing, software\n" +
+" * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+" * See the License for the specific language governing permissions and\n" +
+" * limitations under the License.\n" +
+" */",
+                "Licencia - Version Beta 9.0.1252.10-RC",
                 JOptionPane.INFORMATION_MESSAGE);
         
     }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+        try{
+        if(this.colIndex.length > 0 || this.colIndex != null){
+        String sFileName = "", sFilePath = "";
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
+        int jPanelOption;
+        int status = fileChooser.showSaveDialog(this);
+        if(JFileChooser.APPROVE_OPTION == status){
+            sFileName = fileChooser.getSelectedFile().getName();
+            sFilePath = fileChooser.getCurrentDirectory().getPath();
+            if(fileChooser.getSelectedFile().exists()){
+                jPanelOption = JOptionPane.showOptionDialog(null,
+                            "¡El nombre del archivo que quiere GUARDAR ya existe!.\n"
+                                    + "¿Desea guardar sobre el archivo actual?",
+                            "El archivo ya EXISTE",
+                            JOptionPane.YES_NO_OPTION
+                            ,JOptionPane.WARNING_MESSAGE,
+                            null,null,null);
+                Toolkit.getDefaultToolkit().beep();
+                if(jPanelOption == 0){//Llamar escribir archivo
+                    this.saveData(colIndex, jTable1, jComboBox1, sFileName, sFilePath);
+                    System.err.println(sFileName+" -- "+sFilePath+"  "+jPanelOption);
+                }
+            }
+        }
+        
+        }else {
+            JOptionPane.showMessageDialog(this,
+                "No se ha seleccionado una marca, favor de seleccionar una"
+                        + "\nopcion del menu \"Marcas\"",
+                "Error en la Seleccion de Marcas.",
+                JOptionPane.ERROR_MESSAGE);
+                Toolkit.getDefaultToolkit().beep();
+        }
+        } catch (NullPointerException npe) {
+            JOptionPane.showMessageDialog(this,
+                "No se han seleccionado los indices de las columnas.",
+                "Error en la Seleccion de Columnas.",
+                JOptionPane.ERROR_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();
+          }
+        
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -528,16 +808,22 @@ public class TableView extends javax.swing.JFrame {
     private javax.swing.JButton jButtonCabeceras;
     private javax.swing.JButton jButtonFilas;
     private javax.swing.JButton jButtonSeleccionColumn;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItemExit;
     private javax.swing.JMenuItem jMenuOpen;
+    private javax.swing.JPanel jPanelCombo;
     private javax.swing.JPanel jPanelManejoDatos;
     private javax.swing.JPanel jPanelManejoTabla;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables

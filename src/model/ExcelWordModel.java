@@ -34,6 +34,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -352,8 +353,9 @@ public class ExcelWordModel {
          return data;
 }
     
-    public void saveExcel(Vector tableData) throws IOException, FileNotFoundException, InvalidFormatException{
-        String path = ViewController.pathExcelSalidaDefault+"/Rocketerias.xlsx";
+    public void saveExcel(Vector tableData, String marca, int marcaIndex, boolean se) throws IOException, FileNotFoundException, InvalidFormatException{
+        String path;
+        path = this.checkFile(marca,marcaIndex,se);
         //Vector h = new Vector();
         //Vector f = new Vector();
         //Vector salida;
@@ -376,6 +378,33 @@ public class ExcelWordModel {
         //this.readExcel();
     }
     
+    public void saveExcel(Vector tableData, String marca, int marcaIndex, String sFileName, String sFilePath) throws IOException, FileNotFoundException, InvalidFormatException{
+        String path;
+        if(sFilePath.contains(".xlsx"))
+         path = sFilePath+System.getProperty("file.separator")+sFileName;
+        else path = sFilePath+System.getProperty("file.separator")+sFileName+".xlsx";
+        this.fillWorkBook(tableData,path);
+      
+    }
+    
+    private String checkFile(String marca, int sobreEscribir, boolean guardarNuevo){
+        String path;
+        String ext = ".xlsx";
+        int num = 1;
+        
+        if(sobreEscribir==0)
+         path = ViewController.pathExcelSalidaDefault+"/Rocketerias";
+        else path = ViewController.pathExcelSalidaDefault+"/Rocketerias_"+marca;
+        
+        if(guardarNuevo == true)
+         while(new File(path+ext).exists()){
+            path = ViewController.pathExcelSalidaDefault+"/Rocketerias_"+marca+"Copia "+num;
+         }
+        
+        
+        return path+ext;
+    }
+    
     private void fillWorkBook(Vector tableData, String path) throws FileNotFoundException, IOException, InvalidFormatException{
             //this.xlsxWorkbook.setSheetName(0, "Proshop");
            SXSSFWorkbook wb = new SXSSFWorkbook(500);
@@ -394,6 +423,8 @@ public class ExcelWordModel {
                 pkg.close();
                 //System.out.println(path);
            
+           } else {
+               System.err.println(tableData.toString());
            }
            this.fillWithTableData(wb, tableData);
            this.createFooter(wb);
@@ -402,9 +433,77 @@ public class ExcelWordModel {
            //sheet.shiftRows(5, 6, 10);
                                             //col, fil
            wb.getSheetAt(0).createFreezePane(0, 6);
+           this.createFormulaData(wb);
            this.addImage(wb);
+           wb.setForceFormulaRecalculation(true);
            this.createDataSalida(wb, path);
            
+    }
+    
+    private void createFormulaData(SXSSFWorkbook wb) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SXSSFSheet sheetXLSX = null;
+        sheetXLSX = (SXSSFSheet) wb.getSheetAt(0);
+        Row row;
+        String marcaImpuesto = "1.7";
+        int cells = 0;
+        //System.err.println(sheetXLSX.getPhysicalNumberOfRows());
+         for ( int i = 6; i <= sheetXLSX.getLastRowNum(); i ++ ){
+          row = sheetXLSX.getRow( i );
+          if(row != null){
+           if(cells < row.getLastCellNum())
+            cells = row.getLastCellNum();
+           for ( int j = 0; j < cells; j++ ){
+            Cell cell = row.getCell(j, Row.CREATE_NULL_AS_BLANK);
+            switch(j){
+                case 9:
+                    cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    break;
+                case 8:
+                    cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    break;
+                case 7:
+                    cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    break;
+                case 6:
+                    cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    break;
+                case 5: 
+                    cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                    //cell.setCellFormula(""+CellReference.convertNumToColString(j)+i+"*"+marcaImpuesto);
+                    break;
+                default:
+                    //cell.setCellType(Cell.);
+                    break;
+            }
+            //if ( cell == null)
+            /*/  d.add("");
+            if ( cell != null)
+              switch(cell.getCellType()){
+                    case XSSFCell.CELL_TYPE_BLANK:
+                        //System.out.print(xcell.getStringCellValue() + " ");
+                        break;
+                        
+                    case XSSFCell.CELL_TYPE_NUMERIC:
+                        //System.out.print(xcell.getNumericCellValue() + " ");
+                        break;
+                        
+                    case XSSFCell.CELL_TYPE_STRING:
+                        //System.out.print(xcell.getStringCellValue() + " ");
+                        break;
+                        
+                    default:
+                        //System.out.print("");
+                        break;
+                }*/
+          }
+                    //d.add( "\n" );
+                   // data.add( d );
+         } }
     }
     
     private void fillWithTableData(SXSSFWorkbook wb, Vector tableData){
@@ -719,7 +818,7 @@ public class ExcelWordModel {
             ExcelWordModel ou = new ExcelWordModel();
         try {
         //    ou = new ExcelWordModel(new File(ViewsController.pathExcelSalida));
-            ou.saveExcel(null);
+            ou.saveExcel(null,null,0,false);
         } catch (IOException ex) {
             //Logger.getLogger(ExcelWordModel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidFormatException ex) {
@@ -745,14 +844,19 @@ public class ExcelWordModel {
     private void setColumnWidth(Sheet sheet) {
         final int colWidth = 544;
         sheet.setColumnWidth(0, colWidth*16);
-        sheet.setColumnWidth(1, colWidth*13);
-        for(int i = 2; i < 14; i++)
+        sheet.setColumnWidth(1, colWidth*20);
+        for(int i = 2; i < 12; i++)
         sheet.setColumnWidth(i, colWidth*5);
+        
+        sheet.setColumnWidth(12, colWidth*15);
+        
+        sheet.setColumnWidth(13, colWidth*15);
+        
     }
     
     private void createHeader(SXSSFWorkbook wb){
             String cabecera[] = { 
-               "Modelo",
+                "Modelo",
                 "Descripción",
                 "No.Parte",
                 "Codigo de Barras",
