@@ -380,10 +380,11 @@ public class ExcelWordModel {
     
     public void saveExcel(Vector tableData, String marca, int marcaIndex, String sFileName, String sFilePath) throws IOException, FileNotFoundException, InvalidFormatException{
         String path;
-        if(sFilePath.contains(".xlsx"))
-         path = sFilePath+System.getProperty("file.separator")+sFileName;
-        else path = sFilePath+System.getProperty("file.separator")+sFileName+".xlsx";
+        if(sFileName.endsWith("xlsx"))
+         path = sFilePath + System.getProperty("file.separator") + sFileName;
+        else path = sFilePath + System.getProperty("file.separator") + sFileName + ".xlsx";
         this.fillWorkBook(tableData,path);
+        System.out.println("PATH: "+path);
       
     }
     
@@ -424,7 +425,7 @@ public class ExcelWordModel {
                 //System.out.println(path);
            
            } else {
-               System.err.println(tableData.toString());
+               System.err.println("nuevo archivo - fillWorkData");//tableData.toString());
            }
            this.fillWithTableData(wb, tableData);
            this.createFooter(wb);
@@ -445,7 +446,8 @@ public class ExcelWordModel {
         SXSSFSheet sheetXLSX = null;
         sheetXLSX = (SXSSFSheet) wb.getSheetAt(0);
         Row row;
-        String marcaImpuesto = "1.7";
+        float marcaImpuesto[] = ViewController.factores;
+        ViewController.factores = null;
         int cells = 0;
         //System.err.println(sheetXLSX.getPhysicalNumberOfRows());
          for ( int i = 6; i <= sheetXLSX.getLastRowNum(); i ++ ){
@@ -458,19 +460,19 @@ public class ExcelWordModel {
             switch(j){
                 case 9:
                     cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
-                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-4)+(i+1)+"*"+marcaImpuesto[3]);
                     break;
                 case 8:
                     cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
-                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-3)+(i+1)+"*"+marcaImpuesto[2]);
                     break;
                 case 7:
                     cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
-                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-2)+(i+1)+"*"+marcaImpuesto[1]);
                     break;
                 case 6:
                     cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
-                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto);
+                    cell.setCellFormula(""+CellReference.convertNumToColString(j-1)+(i+1)+"*"+marcaImpuesto[0]);
                     break;
                 case 5: 
                     cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);

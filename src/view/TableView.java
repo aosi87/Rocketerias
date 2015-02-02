@@ -8,31 +8,29 @@ package view;
 
 import controller.ViewController;
 import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.AccessControlException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.NumberFormatter;
 import model.CustomTableModel;
 import org.apache.commons.cli.ParseException;
 
@@ -44,11 +42,12 @@ public class TableView extends javax.swing.JFrame {
     
     private boolean bot1;
     private String path;
+    private float factores[] = null;
     private int colIndex[];
-    private String marcas[] = {"---","Starlighting","Arthea","OTIC Audio/Audio Logic",
+    /*private String marcas[] = {"---","Starlighting","Arthea","OTIC Audio/Audio Logic",
                                "OTIC Led/Video Logic","Stealth Acoustic","Naim","Gefen",
                                "CurrentAudio","Fenix"};
-
+    
     /**
      * Creates new form TableView
      */
@@ -56,7 +55,7 @@ public class TableView extends javax.swing.JFrame {
         initComponents();
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/gfx/icon.png"));
         //this.jComboBox1 = new WideComboBox();
-        this.jComboBox1.setModel(new DefaultComboBoxModel(this.marcas));
+        this.jComboBox1.setModel(new DefaultComboBoxModel(ViewController.marcas));//this.marcas));
         //BoundsPopupMenuListener listener = new BoundsPopupMenuListener(true, false);
         //jComboBox1.addPopupMenuListener( listener );
         jComboBox1.setPrototypeDisplayValue("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
@@ -65,9 +64,10 @@ public class TableView extends javax.swing.JFrame {
     
     public TableView(String path) {
         initComponents();
+        this.jCheckBox1.setVisible(false);
         this.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/gfx/icon.png"));
         //this.jTabbedPane1.setTitleAt(0, path);
-        this.jComboBox1.setModel(new DefaultComboBoxModel(this.marcas));
+        this.jComboBox1.setModel(new DefaultComboBoxModel(ViewController.marcas));//this.marcas));
         this.path = path;
         this.setLocationRelativeTo(null);
         this.jPanelManejoTabla.setBorder(null);
@@ -142,7 +142,7 @@ public class TableView extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuOpen = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuMarcas = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         jMenuItemExit = new javax.swing.JMenuItem();
@@ -242,8 +242,8 @@ public class TableView extends javax.swing.JFrame {
         jMenu1.add(jMenuOpen);
         jMenu1.add(jSeparator1);
 
-        jMenuItem2.setText("Guardar");
-        jMenu1.add(jMenuItem2);
+        jMenuMarcas.setText("Cargar Marcas");
+        jMenu1.add(jMenuMarcas);
 
         jMenuItem3.setText("Guardar como...");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
@@ -544,8 +544,7 @@ public class TableView extends javax.swing.JFrame {
         if(jComboBox1.getSelectedIndex()!=0)
         try {   
         
-        final SaveWindow sw = new SaveWindow(this, true);
-        if(this.colIndex.length > 0 || this.colIndex != null){
+        if(this.colIndex != null || this.colIndex.length > 0 ){
         /*Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -553,77 +552,129 @@ public class TableView extends javax.swing.JFrame {
                     }
          });
          t.start();*/
-        
-        SwingWorker worker;
-               worker = new SwingWorker<Void, Void>() {
-                                     
-                   @Override
-                   public Void doInBackground() {
-                        try {
-                            //============> Aqui se guardan los datos
-                            ViewController.saveData(colIndex,jTable1,jComboBox1,jCheckBox1.isSelected());
-                            sw.getPB().setIndeterminate(false);
-                            sw.getPB().setValue(100);
-                            Thread.sleep(300);
-                            
-                            //this.setVisible(false);
-                            //this.dispose();
-                        } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(null,
-                                            "No fue posible guardar el archivo.\n"
-                                          + "Verifique si el archivo no este siendo\n"
-                                          + "usado por otra persona u otro programa.",
-                                            "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
-                            Toolkit.getDefaultToolkit().beep();
-                            //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                       return null;
-                   }
-                   
-                   @Override
-                   public void done() {
-                       JOptionPane.showMessageDialog(null,
-                            "Datos guardados satisfactoriamente",
-                            "Guardado completo",
-                            JOptionPane.INFORMATION_MESSAGE);
-                       sw.dispose();
-                       Toolkit.getDefaultToolkit().beep();
-                   }};
-         worker.execute();
-         sw.setVisible(true);
-         
-         if(worker.isDone()){
-           sw.dispose();
-           //System.err.println("DONE");
-         }
+          String sFileName = "", sFilePath = "";
+          final JFileChooser fileChooser = new JFileChooser();
+          fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
+          fileChooser.setDialogTitle("Seleccione a que documento adjuntar los datos.");
+          fileChooser.setApproveButtonText("Adjuntar");
+          
+          int jPanelOption;
+          int status = fileChooser.showSaveDialog(this);
+          if(JFileChooser.APPROVE_OPTION == status){
+            sFileName = fileChooser.getSelectedFile().getName();
+            sFilePath = fileChooser.getCurrentDirectory().getPath();
+            if(sFileName.toLowerCase().endsWith("xlsx")){
+             this.openOptionPanel();
+             if(this.factores != null){
+                 ViewController.factores = this.factores;
+                 this.factores = null;
+             }
+             if(fileChooser.getSelectedFile().exists()){
+                Toolkit.getDefaultToolkit().beep();
+                jPanelOption = JOptionPane.showOptionDialog(null,
+                            "¡Se agregaran los datos al final del documento!.\n"
+                                    + "¿Desea continuar con esta acción?.",
+                            "Acción peligrosa!",
+                            JOptionPane.YES_NO_OPTION
+                            ,JOptionPane.WARNING_MESSAGE,
+                            null,null,null);
+                
+                if(jPanelOption == JOptionPane.OK_OPTION){//Llamar escribir archivo
+                     this.saveDataSwingWorker(sFileName, sFilePath, false);
+                    //System.err.println(sFileName+" -- "+sFilePath+"  "+jPanelOption);
+                }
+             } else {
+                Toolkit.getDefaultToolkit().beep();
+                JOptionPane.showMessageDialog(this,
+                "Esta opcion solo puede adjuntar datos a\narchivos Excel existentes.\n"
+              + "Si desea GUARDAR un archivo nuevo, use la opcion en la barra de menu.",
+                "No existe ese archivo.",
+                JOptionPane.ERROR_MESSAGE);
+             } 
+            } else {
+                Toolkit.getDefaultToolkit().beep();
+                JOptionPane.showMessageDialog(this,
+                "Solo es posible adjuntar datos a\narchivos Excel versión 2007 y posteriores.",
+                "Incompatibilidad de documento",
+                JOptionPane.ERROR_MESSAGE);
+            }
+          } 
+                
          //sw.saveData(this.colIndex,this.jTable1);
          
          //sw.setVisible(false);
          //sw.dispose();
-        } else { JOptionPane.showMessageDialog(this,
+        } /*else { JOptionPane.showMessageDialog(this,
                 "No se han seleccionado los indices de las columnas.",
                 "Error en la Seleccion de Columnas.",
                 JOptionPane.ERROR_MESSAGE);
                 Toolkit.getDefaultToolkit().beep();
-           }
+           }*/
         
         } catch (NullPointerException npe) {
+            Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(this,
                 "No se han seleccionado los indices de las columnas.",
                 "Error en la Seleccion de Columnas.",
                 JOptionPane.ERROR_MESSAGE);
+        } else{ 
             Toolkit.getDefaultToolkit().beep();
-        } else{ JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(this,
                 "No se ha seleccionado una marca, favor de seleccionar una"
                         + "\nopcion del menu \"Marcas\"",
                 "Error en la Seleccion de Marcas.",
                 JOptionPane.ERROR_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
+                
         }
-        this.repaint();
+  
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    private void openOptionPanel(){
+        /*NumberFormat format =  DecimalFormat.getInstance();
+        format.setMinimumFractionDigits(0);
+        format.setMaximumFractionDigits(3);
+        format.setMinimumIntegerDigits(0);
+        format.setMaximumIntegerDigits(3);
+        NumberFormatter formatter = new NumberFormatter(format);
+        //formatter.setValueClass(Float.class);
+        //formatter.setMinimum(0.0);
+        //formatter.setMaximum(Float.MAX_VALUE);
+        // If you want the value to be committed on each keystroke instead of focus lost
+        //formatter.setCommitsOnValidEdit(true);
+        formatter.setAllowsInvalid(false);*/
+        JFormattedTextField field1 = new JFormattedTextField();//formatter);
+        JFormattedTextField field2 = new JFormattedTextField();//formatter);
+        JFormattedTextField field3 = new JFormattedTextField();//formatter);
+        JFormattedTextField field4 = new JFormattedTextField();//formatter);
+
+        Object[] message = {
+            "Factor Publico:\n", field1,
+            "Factor Contratista:\n", field2,
+            "Factor Mayoreo:\n", field3,
+            "Factor Super Mayoreo:\n", field4
+        };
+        
+       int option = JOptionPane.showConfirmDialog(this, message, "Factores para la marca: "+this.jComboBox1.getSelectedItem(), JOptionPane.OK_CANCEL_OPTION);
+    
+       if (option == JOptionPane.OK_OPTION){
+        try {
+        this.factores = new float[4];
+        factores[0] = Float.parseFloat(field1.getText().trim().replace("", "1"));
+        factores[1] = Float.parseFloat(field2.getText().trim().replace("", "1"));
+        factores[2] = Float.parseFloat(field3.getText().trim().replace("", "1"));
+        factores[3] = Float.parseFloat(field4.getText().trim().replace("", "1"));
+        } catch (NumberFormatException e){
+           this.factores = null; 
+           Toolkit.getDefaultToolkit().beep();
+           JOptionPane.showMessageDialog(this,
+                "Favor de introducir solo numeros",
+                "Error de entrada",
+                JOptionPane.INFORMATION_MESSAGE);
+           openOptionPanel();
+        }
+       }   
+   }
+    
     public void saveData( int[] colIndex, JTable jTable1 , JComboBox marca, boolean se) {
         try {
             // TODO add your handling code here:
@@ -635,13 +686,14 @@ public class TableView extends javax.swing.JFrame {
              //this.setVisible(false);
              //this.dispose();
         } catch (Exception ex) {
+            ex.printStackTrace();
+            Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(this,
                                             "No fue posible guardar el archivo.\n"
                                           + "Verifique si el archivo no este siendo\n"
                                           + "usado por otra persona u otro programa.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
-            Toolkit.getDefaultToolkit().beep();
             //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -650,6 +702,7 @@ public class TableView extends javax.swing.JFrame {
         try {
             // TODO add your handling code here:
              ViewController.saveData(colIndex,jTable1,marca,sFileName,sFilePath);
+             Toolkit.getDefaultToolkit().beep();
              JOptionPane.showMessageDialog(this,
                 "Datos guardados satisfactoriamente",
                 "Guardado completo",
@@ -657,17 +710,64 @@ public class TableView extends javax.swing.JFrame {
              //this.setVisible(false);
              //this.dispose();
         } catch (Exception ex) {
+            ex.printStackTrace();
+            Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(this,
                                             "No fue posible guardar el archivo.\n"
                                           + "Verifique si el archivo no este siendo\n"
                                           + "usado por otra persona u otro programa.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
-            Toolkit.getDefaultToolkit().beep();
+            
             //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
+    private void saveDataSwingWorker(final String sFileName, final String sFilePath, final boolean sobreExcribir){
+        final SaveWindow sw = new SaveWindow(this, true);
+         SwingWorker worker;
+               worker = new SwingWorker<Void, Void>() {
+                                   
+                   @Override
+                   public Void doInBackground() {
+                        try {
+                            //============> Aqui se guardan los datos
+                            saveData(colIndex, jTable1, jComboBox1, sFileName, sFilePath);
+                            sw.getPB().setIndeterminate(false);
+                            sw.getPB().setValue(100);
+                            Thread.sleep(300);
+                            
+                            //this.setVisible(false);
+                            //this.dispose();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            Toolkit.getDefaultToolkit().beep();
+                            JOptionPane.showMessageDialog(null,
+                                            "No fue posible guardar el archivo.\n"
+                                          + "Verifique si el archivo no este siendo\n"
+                                          + "usado por otra persona u otro programa.",
+                                            "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                            
+                            //Logger.getLogger(TableView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                       return null;
+                   }
+                   
+                   @Override
+                   public void done() {
+                       //Toolkit.getDefaultToolkit().beep();
+                       sw.dispose();
+                       
+                   }};
+               worker.execute();
+         sw.setVisible(true);
+         
+         if(worker.isDone()){
+           sw.dispose();
+           //System.err.println("DONE");
+         }
+    }
     
     private void jButtonSeleccionColumnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSeleccionColumnActionPerformed
         // TODO add your handling code here:
@@ -737,69 +837,89 @@ public class TableView extends javax.swing.JFrame {
         // TODO add your handling code here:
         JOptionPane.showMessageDialog(this,
                 "/*\n" +
-" * Copyright 2014 Isaac Alcocer <aosi87@gmail.com>.\n" +
-" *\n" +
-" * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-" * you may not use this file except in compliance with the License.\n" +
-" * You may obtain a copy of the License at\n" +
-" *\n" +
-" *      http://www.apache.org/licenses/LICENSE-2.0\n" +
-" *\n" +
-" * Unless required by applicable law or agreed to in writing, software\n" +
-" * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-" * See the License for the specific language governing permissions and\n" +
-" * limitations under the License.\n" +
-" */",
-                "Licencia - Version Beta 9.0.1252.10-RC",
+"  Copyright 2015 Isaac Alcocer <aosi87@gmail.com>.\n" +
+" \n" +
+"  Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
+"  you may not use this file except in compliance with the License.\n" +
+"  You may obtain a copy of the License at\n" +
+" \n" +
+"       http://www.apache.org/licenses/LICENSE-2.0\n" +
+" \n" +
+"  Unless required by applicable law or agreed to in writing, software\n" +
+"  distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+"  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+"  See the License for the specific language governing permissions and\n" +
+"  limitations under the License.\n" +
+" ",
+                "Licencia - Version RC 1.0.1034",
                 JOptionPane.INFORMATION_MESSAGE);
         
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         // TODO add your handling code here:
-        try{
+        try {
+        //checamos si ya se selecciono la marca/giro
+        if(this.jComboBox1.getSelectedIndex() != 0){
+        //checamos si ya hay columnas seleccionadas
         if(this.colIndex.length > 0 || this.colIndex != null){
-        String sFileName = "", sFilePath = "";
-        final JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
-        int jPanelOption;
-        int status = fileChooser.showSaveDialog(this);
-        if(JFileChooser.APPROVE_OPTION == status){
+          String sFileName = "", sFilePath = "";
+          final JFileChooser fileChooser = new JFileChooser();
+          fileChooser.setFileFilter(new FileNameExtensionFilter("MS-Excel", "xlsx","xls"));
+          int jPanelOption;
+          int status = fileChooser.showSaveDialog(this);
+          if(JFileChooser.APPROVE_OPTION == status){
             sFileName = fileChooser.getSelectedFile().getName();
             sFilePath = fileChooser.getCurrentDirectory().getPath();
             if(fileChooser.getSelectedFile().exists()){
+                Toolkit.getDefaultToolkit().beep();
                 jPanelOption = JOptionPane.showOptionDialog(null,
-                            "¡El nombre del archivo que quiere GUARDAR ya existe!.\n"
-                                    + "¿Desea guardar sobre el archivo actual?",
-                            "El archivo ya EXISTE",
+                            "¡El nombre del archivo ya existe!.\n"
+                                    + "¿Desea sobrescribirlo?.",
+                            "El nombre del archivo ya EXISTE",
                             JOptionPane.YES_NO_OPTION
                             ,JOptionPane.WARNING_MESSAGE,
                             null,null,null);
-                Toolkit.getDefaultToolkit().beep();
+                
                 if(jPanelOption == 0){//Llamar escribir archivo
-                    this.saveData(colIndex, jTable1, jComboBox1, sFileName, sFilePath);
-                    System.err.println(sFileName+" -- "+sFilePath+"  "+jPanelOption);
+                     this.saveDataSwingWorker(sFileName, sFilePath, true);
+                    //System.err.println(sFileName+" -- "+sFilePath+"  "+jPanelOption);
                 }
-            }
-        }
+            } else {//adjuntar
+                     this.saveDataSwingWorker(sFileName, sFilePath, true);
+                     //System.out.println("crear");
+                   } 
+          }
         
-        }else {
+        } else {
+            Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(this,
                 "No se ha seleccionado una marca, favor de seleccionar una"
                         + "\nopcion del menu \"Marcas\"",
                 "Error en la Seleccion de Marcas.",
                 JOptionPane.ERROR_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
-        }
+                
+           }//fin if columnas seleccionadas
+        
+        } else {
+            Toolkit.getDefaultToolkit().beep();
+                JOptionPane.showMessageDialog(this,
+                "No se ha seleccionado una marca, favor de seleccionar una"
+                        + "\nopcion del menu \"Marcas\"",
+                "Error en la Seleccion de Marcas.",
+                JOptionPane.ERROR_MESSAGE);
+                
+                }//fin if marca
+        
         } catch (NullPointerException npe) {
+            Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(this,
                 "No se han seleccionado los indices de las columnas.",
                 "Error en la Seleccion de Columnas.",
                 JOptionPane.ERROR_MESSAGE);
-            Toolkit.getDefaultToolkit().beep();
+            
           }
-        
+        System.out.println("si - guardar como");
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -814,9 +934,9 @@ public class TableView extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItemExit;
+    private javax.swing.JMenuItem jMenuMarcas;
     private javax.swing.JMenuItem jMenuOpen;
     private javax.swing.JPanel jPanelCombo;
     private javax.swing.JPanel jPanelManejoDatos;

@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -35,11 +36,14 @@ import org.nerdpower.tabula.Table;
 public class ViewController {
     
     //public final String pathExcelTemplate = getClass().getClassLoader().getResource("templates/plantillasalida.xlsx").getPath();
-    public static String outPutFileName = "extractoPDF.csv";
+    public static String pathInicioUsuario = "extractoPDF.csv";
     public static String pathExcelSalidaDefault = System.getProperty("user.home") + System.getProperty("file.separator")+"Desktop";
     public static String pathExcelSalidaUsuario ="";
     public static boolean isCSV = false;
     public static boolean isExcel;
+    public static String[] marcas;
+    public static float[] factores;
+
     private ExcelWordModel ewm = null;
     private PDFModel pdfM = null;
     private final char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
@@ -53,6 +57,7 @@ public class ViewController {
     public ViewController(){}
 
     public ViewController(File selectedFile) throws IOException {
+            ViewController.cargarMarcas();
             String fileToReadname = selectedFile.getName();
             String extension = fileToReadname.substring(fileToReadname.lastIndexOf(".")
                     + 1, fileToReadname.length());
@@ -61,6 +66,7 @@ public class ViewController {
             String pdf = "pdf";
             String docx = "docx";
             String doc = "doc";
+            //System.out.println(Arrays.toString(ViewController.marcas));
             if (Excel2003.equalsIgnoreCase(extension) || Excel2007.equalsIgnoreCase(extension) 
                || docx.equalsIgnoreCase(extension) || doc.equalsIgnoreCase(extension) ) {
                 ewm = new ExcelWordModel(selectedFile);
@@ -68,6 +74,43 @@ public class ViewController {
                   //this.pdfM = new PDFModel(selectedFile);
               }
     }
+    
+    public static void cargarMarcas() {
+        try {
+            ViewController.marcas = readCVSMarcas();
+        } catch (FileNotFoundException ex) {
+            System.out.println("No se pudo leer marcas.txt");
+            //Logger.getLogger(ViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private static String[] readCVSMarcas() throws FileNotFoundException {
+      Scanner scan = new Scanner(new File("marcas.txt"));
+      String[] marcas = null;
+      ArrayList data = new ArrayList();
+      while (scan.hasNextLine()) {
+        //d = new ArrayList();
+        String line = scan.nextLine();
+        //if(line.indexOf(",")>-1)
+          //  array = line.split(",");
+        //else
+          //  array = line.split("\t");
+        
+        //for (int i = 0; i < array.length ; i ++){
+          //  d.add(array[i]);
+        //}
+        //data.add(d);
+        data.add(line);
+        }
+        //scan.close();
+        marcas = new String[data.size()+1];
+        marcas[0] = "---";
+        for (int i = 0; i < data.size(); i++) 
+            marcas[i+1] = data.get(i).toString();
+        
+        //System.out.println(Arrays.toString(marcas));
+        return marcas;
+      }
     
     public static void setPDFCSVExcel(String fileToReadname){
         //String fileToReadname = selectedFile.getName();
@@ -236,7 +279,7 @@ public class ViewController {
             //System.out.println(((JComboBox)this.jPanelComboBox.getComponent(i)).getSelectedIndex());
         //data = getDataFromTable(tabla);
         //System.out.println("Salvando datos."+ data);
-        new ExcelWordModel().saveExcel(newData, marca.getSelectedItem().toString(),marca.getSelectedIndex(), sFileName,sFilePath);
+        new ExcelWordModel().saveExcel(newData, marca.getSelectedItem().toString(),marca.getSelectedIndex(), sFileName, sFilePath);
         //sortVector(indexToCompare,data);
     }
     
@@ -253,17 +296,17 @@ public class ViewController {
     }
     
     public static void createCSV( String path ) throws ParseException{
-        new Tabula(new String[]{path,"-r", "-p all", "-o " + ViewController.outPutFileName});
+        new Tabula(new String[]{path,"-r", "-p all", "-o " + ViewController.pathInicioUsuario});
     }
     
     public static CustomTableModel fillVectorCSV( String path ) {
         Tabula tb = null;
         Vector<Vector> data = new Vector();
         Vector<String> row = null;
-        System.out.println("si");
+        System.out.println("si - fillVectorCSV");
         try{
             System.out.println("tambien");
-            tb = new Tabula(new String[]{path,"-n", "-p all", "-o " + ViewController.outPutFileName});
+            tb = new Tabula(new String[]{path,"-n", "-p all", "-o " + ViewController.pathInicioUsuario});
         } catch ( Exception e){
             System.out.println("YES");
         List<Table> tables = tb.getTable();

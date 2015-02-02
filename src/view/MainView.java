@@ -138,6 +138,7 @@ public class MainView extends javax.swing.JFrame {
 
     private void jButtonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCargarActionPerformed
         final JFileChooser fileChooser = new JFileChooser();
+        //this.cargarMarcas();
         //Agregamos un filtro de extensiones
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("MS-Word", "docx","doc"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Adobe-PDF", "pdf"));
@@ -145,10 +146,15 @@ public class MainView extends javax.swing.JFrame {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         final int returnValue = fileChooser.showDialog(this,"Seleccionar documento");
-              
-        if(fileChooser.getSelectedFile() != null)
+        
+        if(fileChooser.getSelectedFile() != null && (JFileChooser.APPROVE_OPTION == returnValue)){// || JFileChooser.ERROR_OPTION == returnValue)){
             ViewController.setPDFCSVExcel(fileChooser.getSelectedFile().getName());
-            
+            loadSaveWindow(fileChooser, returnValue);
+        }
+        
+    }//GEN-LAST:event_jButtonCargarActionPerformed
+
+        private void loadSaveWindow(final JFileChooser fileChooser, final int returnValue) {
         final SaveWindow sw = new SaveWindow(this, true);
         sw.getLabel().setText("Cargando...");
         SwingWorker worker;
@@ -173,29 +179,25 @@ public class MainView extends javax.swing.JFrame {
                    
                    @Override
                    public void done() {
-                       JOptionPane.showMessageDialog(null,
-                            "Archivo cargado en memoria.",
-                            "Lectura completa",
-                            JOptionPane.INFORMATION_MESSAGE);
+                       
                        sw.dispose();
                        //Toolkit.getDefaultToolkit().beep();
                    }};
         
          worker.execute();
          sw.setVisible(true);
-        
-    }//GEN-LAST:event_jButtonCargarActionPerformed
-
+    }    
+    
     private void loadFile(JFileChooser fileChooser, int returnValue){
               
-        if(ViewController.isPDF){
+        if(ViewController.isPDF && JFileChooser.APPROVE_OPTION == returnValue){
                 try {
                     JOptionPane.showMessageDialog(this,
                                             "Esta es una version Beta para pruebas, todas las funcionalidades"
                                          + "\nestaran disponibles en la version final. Favor de reportar todo"
                                         + "\nfallo en el sistema con su administrador local."
                                         + "\nBuscar el siguiente archivo en el Escritorio\n: "
-                                        + ViewController.outPutFileName,
+                                        + ViewController.pathInicioUsuario,
                                             "Importante.",
                                             JOptionPane.INFORMATION_MESSAGE);
                     Toolkit.getDefaultToolkit().beep();
@@ -210,7 +212,7 @@ public class MainView extends javax.swing.JFrame {
                 }
         }
         
-        if(ViewController.isCSV){
+        if(ViewController.isCSV && JFileChooser.APPROVE_OPTION == returnValue){
             TableView tv = new TableView(fileChooser.getSelectedFile().getAbsolutePath());
             tv.setSheetName(fileChooser.getSelectedFile().getName());
                 try {
@@ -236,15 +238,18 @@ public class MainView extends javax.swing.JFrame {
                     vc = new ViewController(fileChooser.getSelectedFile());
                     
                 } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                    Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(this,
                                             "Ocurrio un error al tratar de leer el Archivo.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
-                    Toolkit.getDefaultToolkit().beep();
+                    
                     break;
                     //this.jButtonCargarActionPerformed(evt);
                     //Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (OutOfMemoryError oome) {
+                    Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(this,
                                             "El archivo es demasiado greande para leerlo,"
                                           + "\nno debe contener mas de 50,000 filas y 5000 columnas."
@@ -255,7 +260,6 @@ public class MainView extends javax.swing.JFrame {
                                           + "\noptimo para la mineria de datos.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
-                    Toolkit.getDefaultToolkit().beep();
                     break;
                 }
                 TableView tv = new TableView(fileChooser.getSelectedFile().getName());
@@ -274,7 +278,7 @@ public class MainView extends javax.swing.JFrame {
                                             "Se encontraron varias Hojas.",
                                             JOptionPane.QUESTION_MESSAGE,
                                             null,opc,null);
-                    Toolkit.getDefaultToolkit().beep();
+                    //Toolkit.getDefaultToolkit().beep();
                     if(s == null)
                         break;//s = vc.getNameSheet(0);
                     for(int i = 0; i < vc.getNumSheet(); i++)
@@ -283,6 +287,10 @@ public class MainView extends javax.swing.JFrame {
                 }
                 tv.setSheetName(s);
                 tv.setTableModel(vc.fillTableVector(index));
+                JOptionPane.showMessageDialog(null,
+                            "Archivo cargado en memoria.",
+                            "Lectura completa",
+                            JOptionPane.INFORMATION_MESSAGE);
                 tv.setVisible(true);
                 this.dispose(); 
                 }
@@ -291,6 +299,7 @@ public class MainView extends javax.swing.JFrame {
                 //System.err.println("CancelOption");
                 break;
             case JFileChooser.ERROR_OPTION:
+                Toolkit.getDefaultToolkit().beep();
                 JOptionPane.showMessageDialog(this,
                                             "No fue posible obtener el archivo."
                                           + "\nVerifique que el archivo no este siendo usado por\n"
@@ -298,7 +307,6 @@ public class MainView extends javax.swing.JFrame {
                                           + "cambiado de directorio/nombre.",
                                             "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
-                Toolkit.getDefaultToolkit().beep();
                 //System.err.println("ErrorDesconocido");
                 break;
             default:
@@ -376,4 +384,8 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     // End of variables declaration//GEN-END:variables
 
+    private void cargarMarcas() {
+        ViewController.cargarMarcas();
+    }
 }
+
