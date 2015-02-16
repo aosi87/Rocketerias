@@ -105,7 +105,7 @@ public class PDFViewer extends JFrame
     //PagePanel page;
     PagePanelFixed page;//Se modifico para poder obtener las coordenadas a analizar
     /** The full screen page display, or null if not in full screen mode */
-    PagePanel fspp;
+    PagePanelFixed fspp;
 
     //    Thread anim;
     /** The current page number (starts at 0), or -1 if no page */
@@ -1028,7 +1028,7 @@ public class PDFViewer extends JFrame
         }
 
         public void run() {
-            fspp = new PagePanel();
+            fspp = new PagePanelFixed();
             fspp.setBackground(Color.black);
             page.showPage(null);
             fullScreen = new FullScreenWindow(fspp, force);

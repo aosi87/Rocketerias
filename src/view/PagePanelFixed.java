@@ -1,6 +1,6 @@
 /*
- * Copyright 2014 Isaac Alcocer.
- *
+ * Copyright 2015 Isaac Alcocer.
+ * Based on PagePanel from PDFRenderer 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -187,7 +187,7 @@ public class PagePanelFixed extends JPanel
 
             } else {
                 // the image is bogus.  try again, or give up.
-                flush();
+                //flush(); //deprecated and not implemented by aosi87
                 if (currentPage != null) {
                     showPage(currentPage);
                 }
@@ -248,6 +248,7 @@ public class PagePanelFixed extends JPanel
         if ((infoflags & (SOMEBITS | ALLBITS)) != 0) {
             // [[MW: dink this rectangle by 1 to handle antialias issues]]
             repaint(x + offx, y + offy, width, height);
+            System.out.println("x="+x+" offx="+offx+" y="+y+" offy="+offy+" width="+width+" height="+height);
         }
         if ((infoflags & (ALLBITS | ERROR | ABORT)) != 0) {
             flag.set();
@@ -306,7 +307,9 @@ public class PagePanelFixed extends JPanel
 
         setClip(new Rectangle2D.Double(zoomRect.x - offx, zoomRect.y - offy,
                 zoomRect.width, zoomRect.height));
-
+        System.err.println("ZoomRect.X:"+zoomRect.x+" offx:"+offx+""
+                + " ZoomRect.y:"+zoomRect.y+" offy:"+offy+" rstas:"
+                + (zoomRect.x - offx)+" -- "+(zoomRect.y - offy));
         zoomRect = null;
     }
 

@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,9 @@ import java.util.logging.Logger;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import org.apache.commons.cli.ParseException;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.nerdpower.tabula.CommandLineApp;
 //import org.jruby.embed.ScriptingContainer;
 import org.nerdpower.tabula.ObjectExtractor;
 import org.nerdpower.tabula.Page;
@@ -316,6 +319,47 @@ public class TabulaController {
             }
         }
     }
+    
+    public static void testGoodPassword() throws IOException {
+        PDDocument pdf_document = PDDocument.load("C:/Users/Manuu Alcocer/Downloads/00Archivos Muestras/Avenview Master Cust Price List Q4 2012_REV_2.pdf");
+        //ObjectExtractor oe = new ObjectExtractor(pdf_document, "userpassword");
+        ObjectExtractor oe = new ObjectExtractor(pdf_document);
+        List<Page> pages = new ArrayList<>();
+        PageIterator pi = oe.extract();
+        while (pi.hasNext()) {
+            pages.add(pi.next());
+        }
+        for(Page line : pages)
+        System.out.println(Arrays.toString(line.getText().toArray()));
+        //assertEquals(1, pages.size());
+    }
+    
+    public static Page getPage(String path, int pageNumber) throws IOException {
+        ObjectExtractor oe = null;
+        try {
+            PDDocument document = PDDocument
+                    .load(path);
+            oe = new ObjectExtractor(document);
+            Page page = oe.extract(pageNumber);
+            return page;
+        } finally {
+            if (oe != null)
+                oe.close();
+        }
+    }
+    
+    public static void testExtraction() throws IOException {
+        Page page = getPage("C:/Users/Elpapo/Desktop/Altman Exclusive Dealer Confidential Price List Jan  2014.pdf", 5);
+        BasicExtractionAlgorithm bea = new BasicExtractionAlgorithm();
+        SpreadsheetExtractionAlgorithm sea = new SpreadsheetExtractionAlgorithm();
+        Table table = bea.extract(page).get(0);
+        StringBuilder sb = new StringBuilder();
+        (new CSVWriter()).write(sb, table);
+        String s = sb.toString();
+        //String[] lines = s.split("\\r?\\n");
+        System.out.println(s);
+        
+    }
 
     public static void main(String[] args) throws ScriptException {
         String datos[] = new String[8];
@@ -329,7 +373,9 @@ public class TabulaController {
         datos[7] = ""; // password del documento si es que tiene password
         
         try {    
-            TabulaController.extractTables(datos);
+            //TabulaController.extractTables(datos);
+            //testGoodPassword();
+            testExtraction();
         } catch (IOException ex) {
             Logger.getLogger(TabulaController.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -193,10 +193,10 @@ public class MainView extends javax.swing.JFrame {
         if(ViewController.isPDF && JFileChooser.APPROVE_OPTION == returnValue){
                 try {
                     JOptionPane.showMessageDialog(this,
-                                            "Esta es una version Beta para pruebas, todas las funcionalidades"
-                                         + "\nestaran disponibles en la version final. Favor de reportar todo"
+                                            "Esta es la version Candidata a ser entregada, las funcionalidades"
+                                         + "\npueden variar hasta la version final Favor de reportar todo"
                                         + "\nfallo en el sistema con su administrador local."
-                                        + "\nBuscar el siguiente archivo en el Escritorio\n: "
+                                        + "\nNumero de version RC 1.0.7504\n: "
                                         + ViewController.pathInicioUsuario,
                                             "Importante.",
                                             JOptionPane.INFORMATION_MESSAGE);

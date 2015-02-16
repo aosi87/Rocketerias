@@ -851,7 +851,7 @@ public class TableView extends javax.swing.JFrame {
 "  See the License for the specific language governing permissions and\n" +
 "  limitations under the License.\n" +
 " ",
-                "Licencia - Version RC 1.0.1034",
+                "Version del programa: RC 1.0.7504",
                 JOptionPane.INFORMATION_MESSAGE);
         
     }//GEN-LAST:event_jMenuItem1ActionPerformed
