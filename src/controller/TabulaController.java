@@ -348,8 +348,9 @@ public class TabulaController {
         }
     }
     
-    public static void testExtraction() throws IOException {
-        Page page = getPage("C:/Users/Elpapo/Desktop/Altman Exclusive Dealer Confidential Price List Jan  2014.pdf", 5);
+    public static String testExtraction( String path, int pageNum ) throws IOException {
+        //Page page = getPage("C:/Users/Elpapo/Desktop/Altman Exclusive Dealer Confidential Price List Jan  2014.pdf", 5);
+        Page page = getPage(path, pageNum);
         BasicExtractionAlgorithm bea = new BasicExtractionAlgorithm();
         SpreadsheetExtractionAlgorithm sea = new SpreadsheetExtractionAlgorithm();
         Table table = bea.extract(page).get(0);
@@ -357,8 +358,9 @@ public class TabulaController {
         (new CSVWriter()).write(sb, table);
         String s = sb.toString();
         //String[] lines = s.split("\\r?\\n");
-        System.out.println(s);
-        
+        //System.out.println(Arrays.toString(lines));
+        //System.err.println(s);
+        return s;
     }
 
     public static void main(String[] args) throws ScriptException {
@@ -375,7 +377,7 @@ public class TabulaController {
         try {    
             //TabulaController.extractTables(datos);
             //testGoodPassword();
-            testExtraction();
+            testExtraction("C:/Users/Elpapo/Desktop/Altman Exclusive Dealer Confidential Price List Jan  2014.pdf",5);
         } catch (IOException ex) {
             Logger.getLogger(TabulaController.class.getName()).log(Level.SEVERE, null, ex);
         }

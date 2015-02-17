@@ -8,6 +8,7 @@ package view;
 
 //import com.alee.laf.WebLookAndFeel;
 import controller.Tabula;
+import controller.TabulaController;
 import controller.ViewController;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -138,7 +139,7 @@ public class MainView extends javax.swing.JFrame {
 
     private void jButtonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCargarActionPerformed
         final JFileChooser fileChooser = new JFileChooser();
-        //this.cargarMarcas();
+        this.cargarMarcas();
         //Agregamos un filtro de extensiones
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("MS-Word", "docx","doc"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Adobe-PDF", "pdf"));
@@ -161,7 +162,7 @@ public class MainView extends javax.swing.JFrame {
         worker = new SwingWorker<Void, Void>() {
                                      
                    @Override
-                   public Void doInBackground() {
+                   public Void doInBackground() throws IOException {
                             loadFile(fileChooser, returnValue);
                             //ViewController.saveData(colIndex,jTable1,jComboBox1,jCheckBox1.isSelected());
                             sw.getPB().setIndeterminate(false);
@@ -188,28 +189,40 @@ public class MainView extends javax.swing.JFrame {
          sw.setVisible(true);
     }    
     
-    private void loadFile(JFileChooser fileChooser, int returnValue){
-              
+    private void loadFile(final JFileChooser fileChooser, int returnValue) {
+            String tabula = "";
         if(ViewController.isPDF && JFileChooser.APPROVE_OPTION == returnValue){
-                try {
-                    JOptionPane.showMessageDialog(this,
-                                            "Esta es la version Candidata a ser entregada, las funcionalidades"
-                                         + "\npueden variar hasta la version final Favor de reportar todo"
-                                        + "\nfallo en el sistema con su administrador local."
-                                        + "\nNumero de version RC 1.0.7504\n: "
-                                        + ViewController.pathInicioUsuario,
-                                            "Importante.",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                    Toolkit.getDefaultToolkit().beep();
-                    ViewController.createCSV(fileChooser.getSelectedFile().getAbsolutePath());
-                    TableView tv = new TableView(fileChooser.getSelectedFile().getAbsolutePath());
-                    tv.setTableModel(ViewController.fillVectorCSV(fileChooser.getSelectedFile().getAbsolutePath()));
-                    tv.setVisible(true);
-                    this.dispose();
-                } catch (ParseException ex) {
-                    ex.printStackTrace();
-                    Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            JOptionPane.showMessageDialog(this,
+                    "Esta es la version Candidata a ser entregada, el rendimiento"
+                            + "\npuede variar entre versiones, las funciones tambien.\n"
+                            + "Favor de reportar todo fallo en el sistema con su administrador local."
+                            + "\nNumero de version RC 1.0.7504\n: ",
+                    //+ ViewController.pathInicioUsuario,
+                    "Importante.",
+                    JOptionPane.INFORMATION_MESSAGE);
+            Toolkit.getDefaultToolkit().beep();
+            String numPage = JOptionPane.showInputDialog(
+                    this,
+                    "Ingrese el numero de pagina donde\n"
+                            + "se localiza la tabla para extraer.",
+                    "Ingrese el numero de pagina",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            final int pageNum = Integer.parseInt(numPage);
+            
+            System.out.println("llega a tableview");
+            try {
+                tabula = TabulaController.testExtraction(fileChooser.getSelectedFile().getAbsolutePath(), pageNum); 
+                PDFViewerSimple.init(fileChooser.getSelectedFile().getAbsolutePath(), pageNum);
+                
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            TableView tv = new TableView(fileChooser.getSelectedFile().getAbsolutePath());
+            tv.setSheetName(fileChooser.getSelectedFile().getName()+"- Pagina: "+pageNum);
+            tv.setTableModel(ViewController.fillVectorCSV(tabula));
+            tv.setVisible(true);
+            this.dispose();
         }
         
         if(ViewController.isCSV && JFileChooser.APPROVE_OPTION == returnValue){

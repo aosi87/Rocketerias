@@ -799,7 +799,7 @@ public class ExcelWordModel {
     
     public static void printVector(Vector a){
         try{                     //filas   columnas
-        System.out.println(a.size()+" "+((Vector)a.get(1)).size());
+        System.out.println(a.size()+" "+((Vector)a.get(0)).size());
         } catch (ArrayIndexOutOfBoundsException e){e.printStackTrace();}
         for (int i = 0 ; i < a.size(); i++){
           //if(!((ArrayList)a.get(2)).get(i).toString().equalsIgnoreCase(""))

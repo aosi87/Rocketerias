@@ -59,6 +59,7 @@ public class TableView extends javax.swing.JFrame {
         //BoundsPopupMenuListener listener = new BoundsPopupMenuListener(true, false);
         //jComboBox1.addPopupMenuListener( listener );
         jComboBox1.setPrototypeDisplayValue("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        System.out.println("entra al tableview");
 
     }
     
@@ -295,12 +296,12 @@ public class TableView extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanelManejoDatos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanelCombo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanelCombo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelManejoTabla, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 481, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -352,7 +353,7 @@ public class TableView extends javax.swing.JFrame {
                     try {
                     while(new File("C:\\Users\\Elpapo\\Desktop\\extractoPDF.cvs").canWrite())
                       tv = new TableView("C:\\Users\\Elpapo\\Desktop\\extractoPDF.cvs");
-                      tv.setTableModel(ViewController.fillVectorCSV("C:\\Users\\Elpapo\\Desktop\\extractoPDF.cvs"));
+                      //tv.setTableModel(ViewController.fillVectorCSV("C:\\Users\\Elpapo\\Desktop\\Altman Exclusive Dealer Confidential Price List Jan  2014.pdf",1));
                       tv.setVisible(true);
                       this.dispose();
                     } catch (AccessControlException ace) { System.setSecurityManager(oldSecManager); System.err.println("oldSecManager");}

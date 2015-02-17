@@ -36,7 +36,7 @@ public class PDFViewerSimple extends JFrame
 
    public PDFViewerSimple (String title){
       super (title);
-      setDefaultCloseOperation (EXIT_ON_CLOSE);
+      setDefaultCloseOperation (JDialog.DISPOSE_ON_CLOSE);
 
       JLabel label = new JLabel (new ImageIcon (image));
       label.setVerticalAlignment (JLabel.TOP);

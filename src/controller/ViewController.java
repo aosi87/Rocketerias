@@ -46,7 +46,7 @@ public class ViewController {
 
     private ExcelWordModel ewm = null;
     private PDFModel pdfM = null;
-    private final char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
+    private static final char indexColumn[] = {'A','B','C','D','E','F','G','H','I','J','K','L',
                            'M','N','O','P','Q','R','S','T','U','V','X','Y','Z'};
     public static boolean isPDF = false;
     
@@ -299,30 +299,84 @@ public class ViewController {
         new Tabula(new String[]{path,"-r", "-p all", "-o " + ViewController.pathInicioUsuario});
     }
     
-    public static CustomTableModel fillVectorCSV( String path ) {
-        Tabula tb = null;
+    public static String[] splitString(String line){
+     //String line = "foo,bar,c;qual=\"baz,blurb\",d;junk=\"quux,syzygy\"";
+
+        String otherThanQuote = " [^\"] ";
+        String quotedString = String.format(" \" %s* \" ", otherThanQuote);
+        String regex = String.format("(?x) "+ // enable comments, ignore white spaces
+                ",                         "+ // match a comma
+                "(?=                       "+ // start positive look ahead
+                "  (                       "+ //   start group 1
+                "    %s*                   "+ //     match 'otherThanQuote' zero or more times
+                "    %s                    "+ //     match 'quotedString'
+                "  )*                      "+ //   end group 1 and repeat it zero or more times
+                "  %s*                     "+ //   match 'otherThanQuote'
+                "  $                       "+ // match the end of the string
+                ")                         ", // stop positive look ahead
+                otherThanQuote, quotedString, otherThanQuote);
+
+        String[] tokens = line.split(regex, -1);
+        
+        //for(String t : tokens) System.out.println("> "+t);
+        
+        return tokens;
+    }
+    
+    public static CustomTableModel fillVectorCSV( String tabula ) {
+        //Tabula tb = null;
+        //String tabula = "";
         Vector<Vector> data = new Vector();
         Vector<String> row = null;
-        System.out.println("si - fillVectorCSV");
-        try{
-            System.out.println("tambien");
-            tb = new Tabula(new String[]{path,"-n", "-p all", "-o " + ViewController.pathInicioUsuario});
-        } catch ( Exception e){
-            System.out.println("YES");
-        List<Table> tables = tb.getTable();
-        
-        for(Table table : tables)
-         for (List<RectangularTextContainer> rows: table.getRows()) {
-            row = new Vector();
-            for (RectangularTextContainer tc: rows) {
-                row.add(tc.getText());    
-            }
-            System.out.println(row);
-            data.add(row);
-         }
+        int mayor = 0;
+        String[] s2 = null;
+        String[] s = tabula.split("\\r?\\n");
+        //row = new Vector<String>();
+        //System.err.print(s[0]+"");
+        for (int i = 0; i < s.length; i++){
+             s2 = splitString(s[i]);
+             row = new Vector<String>();
+          for (int j = 0; j < s2.length; j++){
+            row.add(s2[j]);
+            /*if(s[j].contains("\\n")){
+                data.add(row);
+                System.out.println();
+                row = new Vector<String>();
+            }*/
+          }
+          if(mayor < row.size())
+              mayor = row.size();
+          data.add(row);
+          //System.out.print(mayor+"|");
+          //System.out.println(data.size()+"-");
         }
-        ExcelWordModel.printVector(data);
-        return new CustomTableModel(data, new Vector());
+        //System.out.println(Arrays.deepToString(data.toArray()));
+        //ExcelWordModel.printVector(data);
+        //CustomTableModel ctm = new CustomTableModel();
+        //ctm.setColumnCount(mayor);
+        //ctm.setRowCount(data.size());
+        //System.out.println(Arrays.deepToString(data.toArray()));
+        
+        for (int i = 0 ; i < data.size() ; i++){
+          for(int j = 0 ; j < mayor ;  j++){
+             if(mayor > ((Vector)data.get(i)).size()){
+              ((Vector)data.get(i)).add("");
+              //ctm.setValueAt(((Vector)data.get(i)).get(j), i, j);
+             } else{
+               //ctm.setValueAt(((Vector)data.get(i)).get(j), i, j);
+               //System.out.println(i+".- "+ctm.getValueAt(i, j));
+              }
+          }
+        }
+        Vector header = new Vector();
+        for(int i = 0; i < row.size(); i++)
+            header.add(indexColumn[i]);
+        
+        int i = 1;
+        for(Vector t : data)
+         System.out.println((i++)+".- colNum: "+t.size()+"-"+ Arrays.deepToString(t.toArray()) );
+        //ctm.setDataVector(data, new Vector());
+        return new CustomTableModel(data, header);
     }
     
     public static boolean isString(String str){
@@ -412,7 +466,7 @@ public class ViewController {
     
     public static CustomTableModel fillTableCSV(Vector a){
         CustomTableModel dtm = new CustomTableModel();
-        dtm.setColumnCount(4);
+        dtm.setColumnCount(((Vector)a.get(0)).size());
         dtm.setRowCount(a.size());
         dtm.setDataVector(a, new Vector());
         return dtm;

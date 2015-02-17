@@ -26,11 +26,11 @@ public class CustomTableModel extends DefaultTableModel{
         isCellEditable = false;
     }
 
-    @Override
+    /*@Override
    public boolean isCellEditable(int row, int column) {
        //Only the third column
        return this.isCellEditable;
-   }
+   }*/
 
     /**
      * @param isCellEditable the isCellEditable to set

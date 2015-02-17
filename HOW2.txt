@@ -1,0 +1,23 @@
+El programa esta en version CANDIDATA, es decir, es la version estable y lista para su uso, sin embargo pueden existir diferencias con la version FINAL ó COMERCIAL. Este programa esta licenciado bajo la Licencia Apache 2.0 la cual se incluye con un documento anexo.
+
+NOTAS PARA SU USO:
+
+1.- Abrir el programa, ahora incluye una lista de las marcas en la carpeta raiz de donde se localiza el programa, esta lista de marcas es editable, es posible agregar, eliminar, sustituir elementos sin riesgo alguno, simplemente debe serguirse el orden de una marca por linea.
+
+2.- Al abrir un documento Excel, si este tiene mas de una FOJA es necesario introducir el numero o seleccionar el nombre de la lista desplegable, si no es el caso se seleccionara la primera foja encontrada.
+
+3.- Una vez cargado el archivo, podremos modificar la TABLA, y solamente la TABLA para su manejo optimo y reduccion de lineas/columnas sin datos, para despues ser almacenadas en algun archivo.
+
+4.- ADJUNTAR DATOS como el nombre indica permite adjuntar datos solo a documentos EXCEL version 2007 en adelante, y solo si estos tienen el formato sugerido para el programa.
+
+5.- Es posible crear nuevos archivos EXCEL desde el programa para generar diferentes listas de MARCAS, lo cual es posible utilizando las opciones de la barra de menu ARCHIVO, y seleccionando GUARDAR COMO... y seleccionando la ruta correspondiente.
+
+6.- A PETICION se puede editar la celdas individuales, esto no modifica ningun dato de el archivo origen, y es posible guardar de la tabla en el programa. NO ES POSIBLE ADJUNTAR FILAS NI COLUMNAS, solo es posible modificar el numero de FILAS/COLUMNAS otorgado por el archivo origen. Para modificar las celtas se necesita hacer doble click sobre la celta. LA SELECCION SIEMPRE ES FILA/COLUMNA con el boton "Seleccionando:".
+
+7.- En la seccion MANEJO DE TABLA, encontraran herramientas para la edicion basica de la tabla extraida. Borrar columnas/filas vacias, o seleccionar las cabeceras de la tabla para su mejor entendimiento.
+
+8.- La seccion Manejo de Datos permite adjuntar y seleccionar las columnas a almacenar como se acordo al crear los requerimientos. El programa solicitara estos datos si no se han seleccionado, esto para evitar crear datos sin las condiciones de MARCA y en que COLUMNA debe ir cada DATO.
+
+9.- En el caso de PDF, ahora solicitara el archivo y SE DEBE CONOCER QUE PAGINA DEL EXCEL contiene la tabla, esto con el fin de optimizar la extraccion y evitar la mayor cantidad de DATOS innecesarios en MEMORIA, para no saturar el ordenador y poder trabajar con cantidades grandes de DATOS de una manera ordenada y mucho mas sencilla. 
+
+10.- Se mostrara en pantalla una ventana de la pagina del PDF, y la tabla para su manejo, esto hace mas sencillo entender como esta compuesta la tabla, ya que pueden existir imagenes y otro tipo de elementos en el PDF que no son o contienen texto, incluso hay tablas que no vienen en forma de TABLA, sino como datos esporadicos y al ser generado el PDF los muestra como imagenes y no DATOS en una TABLA.
